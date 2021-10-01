@@ -1,0 +1,448 @@
+.topNav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topNav a, .topNav-a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topNav .icon {
+  display: none;
+}
+
+.topNav a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.box {
+  top: 10px;
+  
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1rem;
+  padding: 10px;
+  text-align: left;
+}
+
+
+.right{
+  text-align: right
+}
+
+.sudokuTable { 
+  border-collapse: collapse; 
+  font-family:  sans-serif; 
+  position: relative;
+  margin-right: 50px; 
+
+}
+
+.labyrinth{
+  margin-top: 2rem;
+  border-collapse: collapse;
+  position: relative;
+}
+
+.ChessBoard{
+  margin-top: 2rem;
+  border-collapse: collapse;
+  position: relative;
+}
+
+.button:disabled {
+  opacity: 0.5;
+}
+
+table.labyrinth  td {
+  height: 2em; 
+  width: 2em; 
+  border-color: black;
+  border: solid medium;
+  background-color: white;
+  padding: 0;
+}
+
+
+.label{
+  height: 2.5em;
+  top: 50%;
+}
+
+.bottom_label{
+  height: 2.5em;
+  top: 50%;
+}
+
+table.ChessBoard  td{
+  height: 2.5em; 
+  width: 2.5em; 
+  border-color: black;
+  border: solid medium;
+  background-color: rgb(95, 163, 40);
+  opacity: 0.8;
+  text-align: center;
+  padding: 0;
+}
+
+.ChessBoard tr:nth-child(odd) td:nth-child(even){
+  background-color: rgb(241, 242, 243);
+}
+
+.ChessBoard tr:nth-child(even) td:nth-child(odd){
+  background-color: rgb(241, 242, 243);
+}
+
+.ChessBoard td:nth-child(9) {
+  width: 1.0em;
+  user-select: none;
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+}
+
+#knight{
+  width: 1.7em;
+  height: 1.7em;
+}
+
+#knights {
+  width: 350px;
+  height: 70px;
+  
+  border: 1px solid #aaaaaa;
+  
+}
+
+.ChessBoard tr:nth-child(9) td{
+  height: 0.8em;
+  user-select: none;
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+}
+
+table.sudokuTable  td { 
+  border: solid thin; 
+  height: 2.5em; 
+  width: 2.5em; 
+  text-align: center; 
+  padding: 0; 
+  background-color: white; 
+  box-shadow: 30px 30px 0px #999; 
+  border-color: black;
+}
+
+
+
+sudokuTable> tbody, colgroup{ border-left:  solid medium;
+  border-color: black; }
+
+
+
+
+.sudokuTable :nth-child(3n+1)  td{ border-top:  solid medium;
+  border-color: black;
+ }
+
+ .sudokuTable :nth-child(9)  td{ border-bottom:  solid medium;
+  border-color: black;
+ }
+
+table.sudokuTable caption{
+  font-size: 120%;
+}
+
+.button{
+  position: relative;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.solve:hover:enabled {
+  background-color: chartreuse ;
+  color: white;
+}
+
+.create:hover:enabled {
+  background-color: #06afe7 ;
+  color: white;
+}
+
+.close:hover:enabled {
+  background-color: #5f6668 ;
+  color: white;
+}
+
+.add:hover:enabled {
+  background-color: #d406e7 ;
+  color: white;
+}
+
+.solve{
+  background-color: #4CAF50;
+}
+
+.close{
+  background-color: rgb(173, 163, 163);
+}
+
+.create{
+  background-color: #008CBA;
+}
+
+.add{
+  background-color: purple;
+}
+
+.potential_numbers{
+  color: rgb(182, 74, 74);
+  height: 100%;
+}
+
+.rectangle{
+  
+
+  border-color: aliceblue;  
+  display:inline-block;
+  margin-left: 1rem;
+  padding: 0.5rem;
+}
+.black{
+  background-color: #111;
+}
+.red{
+  background-color: rgb(238, 12, 12);
+}
+.blue{
+  background-color: blue;
+}
+.green{
+  background-color: green;
+}
+
+.small-box{
+  margin-top: 10px;
+  border-color: #111;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1rem;
+  border-style: ridge;
+  text-align: left;
+  padding: 10px,10px,10px,10px;
+}
+.very-small-box{
+
+  height: 1.5em;
+  text-align: center;
+  border-color: #111;
+  display: inline-block;
+  margin-left: 0.1em;
+  margin-right: 0.1em;
+  font-size: 1rem;
+  border-style: ridge;
+  text-align: left;
+  padding: 0.1rem 0.4rem;
+}
+
+.switch {
+  top: 5px;
+  position: relative;
+  display: inline-block;
+  width: 10rem;
+  height: 1.5rem;
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+  
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1rem;
+  width: 8rem;
+  left: 1rem;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.error{
+  background-color: rgb(233, 114, 114);
+}
+
+.sudoku-td-input{
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  border: none;
+  text-align: center;
+}
+
+.sudoku-td-input:focus{
+  background-color: rgb(144, 214, 241);
+}
+
+.toggle_text {
+    position: absolute;
+    width:100%;
+    text-align:center;
+     
+    white-space: nowrap;
+    display: inline-block;
+}
+
+select {
+  box-shadow: 0 10px 25px rgb(0,0,0);
+  font-size: 1rem;
+  padding: 0.45em 2em 0.5em 0.5em;
+  background: #4d5061;
+  color: white;
+  border: 0;
+}
+
+.custom-select{
+  display: inline;
+  position: relative;
+}
+
+
+
+.center{
+  width: 50%;
+  margin: auto;
+}
+
+.path{
+  margin: auto;
+  justify-content: center;
+  width: 40%;
+  height: 100%;
+  pointer-events:none;
+}
+
+
+.allowedMoves, .forbiddenMoves{
+  margin: auto;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+  pointer-events:none;
+}
+
+
+.forbiddenMoves{
+  background-color: rgb(230, 130, 130);
+}
+
+.allowedMoves{
+  background-color: rgb(97, 178, 224);
+}
+
+.hamburger{
+  width: 35px;
+  height: 3px;
+  background-color: white;
+  margin: 3.5px 0;
+}
+
+
+@media screen and (max-width: 600px) {
+  .box {
+    width : 100%;
+    padding: 0;
+    padding-top: 1rem;
+  }
+  
+  table.sudokuTable{
+    width: 100%;
+  }
+
+  table.sudokuTable  td{
+    width: calc(100%/9);
+    padding: 0;
+    margin: 0;
+    overflow-x:auto
+  }
+
+  .table.sudokuTable  td{
+    box-shadow: 0 0 0 none;
+  }
+
+  .topNav a:not(:first-child), .topNav-a {display: none;}
+  
+  .topNav .icon {
+    margin-right: 1rem;
+    margin-top: 0.8rem;
+    float: right;
+    display: block;
+  }
+  
+  .dropdown-content{
+    position: relative;
+    margin-top: 0.8rem;
+  }
+
+  .topNav.responsive {
+    position: relative
+  ;}
+  
+  .topNav.responsive a, .topNav.responsive .topNav-a  {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .topNav.responsive .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
+@media screen and (min-width: 850px){
+  .box {width : 45%}
+}
+
+
