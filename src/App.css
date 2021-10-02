@@ -41,11 +41,13 @@
 
 
 
-.explaining-labels, .label-rules{
+.explaining-labels, .label-rules,.agenda-labels, .button-area {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
+
 
 .grid-container {
   width: 600px;
@@ -54,6 +56,11 @@
   
   padding: 10px;
 }
+
+.sudoku-div { grid-area: table; }
+.buttons-div{ grid-area: buttonArea;}
+.label-area{ grid-area: labelArea }
+.explaining-labels {grid-area: smallBox}
 
 .sudoku-grid{
   grid-template-areas:
@@ -73,10 +80,21 @@
   'labelArea labelArea -';
 }
 
-.sudoku-div { grid-area: table; }
-.buttons-div{ grid-area: buttonArea;}
-.label-area{ grid-area: labelArea }
-.explaining-labels {grid-area: smallBox}
+.button-area{grid-area: buttonArea;}
+.labyrinth-div{grid-area: table;}
+.agenda-labels{grid-area: labelArea;}
+
+.path-grid{
+  width: 90%;
+  grid-template-areas:
+  'buttonArea buttonArea buttonArea buttonArea -'
+  'table table table table labelArea';
+}
+
+
+.labyrinth-div{
+  overflow-x:auto;
+}
 
 .sudokuTable { 
   border-collapse: collapse; 
@@ -103,13 +121,21 @@
 }
 
 table.labyrinth  td {
+  position: relative;
   height: 2em; 
   width: 2em; 
   border-color: black;
   border: solid medium;
   background-color: white;
   padding: 0;
+  text-align: center;
+  font-size: 1.2rem;
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
+
 
 
 .label{
@@ -260,17 +286,30 @@ table.sudokuTable caption{
 
   border-color: aliceblue;  
   display:inline-block;
-  margin-left: 1rem;
+  
   padding: 0.5rem;
 }
+
+
 .black{
   background-color: #111;
 }
+
+.purple{
+  background-color: purple;
+}
+
 .red{
   background-color: rgb(238, 12, 12);
 }
+.brown{
+  background-color: brown;
+}
 .blue{
   background-color: blue;
+}
+.orange{
+  background-color: orange;
 }
 .green{
   background-color: green;
@@ -288,6 +327,11 @@ table.sudokuTable caption{
   text-align: left;
   padding: 10px,10px,10px,10px;
 }
+
+.small-box > div{
+  margin-left: 1rem;
+}
+
 .very-small-box{
 
   height: 1.5em;
@@ -375,7 +419,7 @@ input:focus + .slider {
 }
 
 select {
-  box-shadow: 0 10px 25px rgb(0,0,0);
+  
   font-size: 1rem;
   padding: 0.45em 2em 0.5em 0.5em;
   background: #4d5061;
@@ -396,7 +440,11 @@ select {
 }
 
 .path{
+  
   margin: auto;
+  position: absolute;
+  top: 0;
+  left: 30%;
   justify-content: center;
   width: 40%;
   height: 100%;
@@ -436,6 +484,10 @@ select {
     padding: 0;
     width: 95%;
     max-width: 450px;
+    
+  }
+
+  .sudoku-grid{
     grid-template-areas:
     'table'
     'buttonArea'
@@ -443,6 +495,20 @@ select {
     'smallBox';
   }
 
+  .path-grid{
+    width: 95%;
+    grid-template-areas:
+    'buttonArea'
+    'table'
+    'labelArea';
+  }
+
+  .chess-grid{
+    grid-template-areas:
+    'table'
+    'labelArea'
+    'smallBox';
+  }
 
   .box {
     width : 100%;

@@ -10,7 +10,7 @@ export default class Pathfinder extends React.Component {
         this.state = {
             rows: 17,
             columns: 30,
-            canAddd: true,
+            canAdd: true,
             buttonDisable: false,
             whatToPlace: 0,
             colorToWhatToPlace: ["black", "orange", "brown"],
@@ -54,9 +54,12 @@ export default class Pathfinder extends React.Component {
         if(copyArray[x][y]!==this.state.colorToWhatToPlace[this.state.whatToPlace-1]){
             copyArray[x][y] = this.state.colorToWhatToPlace[this.state.whatToPlace-1]
             if(this.state.colorToWhatToPlace[this.state.whatToPlace-1]==="orange"){
+                
                 let copyPoints = this.state.points
                 copyPoints.push([x,y])
                 this.setState({points: copyPoints})
+
+                e.target.innerHTML += copyPoints.length
             }
             else{
                 let copyPoints = this.state.points
@@ -70,6 +73,9 @@ export default class Pathfinder extends React.Component {
                 let copyPoints = this.state.points
                 copyPoints= this.remove(copyPoints, [x,y])
                 this.setState({points: copyPoints})
+                
+                
+                e.target.innerHTML = ""
             }    
         }
         this.setState({colors: copyArray})
@@ -105,6 +111,7 @@ export default class Pathfinder extends React.Component {
     }
 
     cleanTiles(){
+        
         let copyArray = this.state.colors
         for(let i=0; i<this.state.rows; i++){
             for(let j=0; j<this.state.columns; j++){
@@ -112,48 +119,66 @@ export default class Pathfinder extends React.Component {
             }
         }
         this.setState({colors: copyArray})
+        
         let copyPathColors = this.state.pathColors
         for(let i=0; i<this.state.rows; i++){
             for(let j=0; j<this.state.columns; j++){
                 copyPathColors[i][j]="none"
             }
         }
+        
+        for(let i=0; i<this.state.points.length; i++){
+            let x = this.state.points[i][0]
+            let y = this.state.points[i][1]
+            let id = "pt"+x.toString()+"/"+y.toString()
+            document.getElementById(id).innerHTML = ""
+        }
+        
         this.setState({points: []})
         this.setState({pathColors: copyPathColors})
     }
 
     async findPath(){
-        if(this.state.points.length===0){
+        if(this.state.points.length<2){
             this.setState({errors: ["At least two points needed to find a path"]})
             return
         }
-        this.setState({canAdd: false})
-        this.setState({errors: []})
-        this.setState({buttonDisable: true})
-        // find path
-        let gCopy = this.state.gScore
-        let fCopy = this.state.fScore
-        let pathCopy = this.state.path
-        for(let x=0; x<this.state.rows; x++){
-            for(let y=0; y<this.state.columns;y++){
-                gCopy[x][y]=Infinity
-                fCopy[x][y]=this.countingFScore(x,y, this.state.points[1])
-                pathCopy[x][y]=[]
+        for(let i=0;i<this.state.points.length-1;i++){
+            
+            this.setState({canAdd: false})
+            this.setState({errors: []})
+            this.setState({buttonDisable: true})
+            // find path
+            
+            let gCopy = this.state.gScore
+            let fCopy = this.state.fScore
+            let pathCopy = this.state.path
+            
+            for(let x=0; x<this.state.rows; x++){
+                for(let y=0; y<this.state.columns;y++){
+                    gCopy[x][y]=Infinity
+                    fCopy[x][y]=this.countingFScore(x,y, this.state.points[1])
+                    pathCopy[x][y]=[]
+                }
             }
+            
+            gCopy[this.state.points[i][0]][this.state.points[i][1]] = 0
+            this.setState({gScore: gCopy})
+            this.setState({fScore: fCopy})
+            this.setState({path: pathCopy})
+            
+            await this.setState({beginningPoint: this.state.points[i]})
+            await this.setState({endingPoint: this.state.points[i+1]})
+            await this.updateNeighbors(this.state.points[i][0], this.state.points[i][1])
+
+            let foundPath = this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]!==Infinity
+            if(foundPath){
+                this.ReconstructPath(this.state.endingPoint[0], this.state.endingPoint[1])
+            }
+            else{this.setState({errors: ["No path found"]})}
+            this.setState({buttonDisable: false})
+            this.setState({canAdd: true})
         }
-        gCopy[this.state.points[0][0]][this.state.points[0][1]] = 0
-        this.setState({gScore: gCopy})
-        this.setState({fScore: fCopy})
-        this.setState({path: pathCopy})
-        await this.setState({beginningPoint: [this.state.points[0][0],this.state.points[0][1]]})
-        await this.setState({endingPoint: this.state.points[1]})
-        await this.updateNeighbors(this.state.points[0][0], this.state.points[0][1])
-        if(this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]!==Infinity){
-            this.ReconstructPath(this.state.points[1][0], this.state.points[1][1])
-        }
-        else{this.setState({errors: ["No path found"]})}
-        this.setState({buttonDisable: false})
-        this.setState({canAdd: true})
         return
     }
     
@@ -167,7 +192,11 @@ export default class Pathfinder extends React.Component {
 
     async updatePathColor(x,y,color){
         let copyColors = this.state.pathColors
+        if(copyColors[x][y]==="purple"){
+            return
+        }
         copyColors[x][y]=color
+        
         await this.setState({pathColors: copyColors})
         await sleep("25ms")
         return
@@ -325,44 +354,54 @@ export default class Pathfinder extends React.Component {
 
     render() {
         return (
-            <div>
-                <div className="center">
-                    <div className="custom-select">   
-                        <select value={this.state.whatToPlace} onChange={(e) =>this.handleChange(e)}>
-                            <option value="0">What to place:</option>
-                            <option value="1">Blockade</option>
-                            <option value="2">Starting point</option>
-                            <option value="3">Mountain</option>
-                        </select>
+            <div className="box">
+                <div className="grid-container path-grid">
+                    <div className="button-area">
+                        <div className="custom-select">   
+                            <select value={this.state.whatToPlace} onChange={(e) =>this.handleChange(e)}>
+                                <option value="0">What to place:</option>
+                                <option value="1">Blockade</option>
+                                <option value="2">Starting point</option>
+                                <option value="3">Mountain</option>
+                            </select>
+                        </div>
+                        <button disabled={this.state.buttonDisable} onClick={()=> this.findPath()} className="button solve">Solve</button>
+                        <button disabled={this.state.buttonDisable} onClick={()=> this.cleanTiles()} className="button create">Clean</button>
+                        {this.state.errors.map((value) => {
+                        return(
+                            <div className="error">{value}</div>
+                        )
+                        })}
                     </div>
-                    <button disabled={this.state.buttonDisable} onClick={()=> this.findPath()} className="button solve">Solve</button>
-                    <button disabled={this.state.buttonDisable} onClick={()=> this.cleanTiles()} className="button create">Clean</button>
-                    {this.state.errors.map((value) => {
-                                        return(
-                                            <div className="error">{value}</div>
-                                        )
-                                    })}
+                    
+                    <div className="labyrinth-div">
+                        <table className="labyrinth">
+                            <tbody>
+                                {Array.from(Array(this.state.rows), (_e, i) => {
+                                    return( 
+                                        <tr key={i}>
+                                            {Array.from(Array(this.state.columns), (_e, j) => {
+                                                return(
+                                                    <td key={j} onClick={(e)=> this.changeTerrain(e)} onMouseOver={(e)=> this.checkIfMouseIsPressed(e)} style={{background: this.state.colors[i][j]}} 
+                                                        id={"pt"+i.toString()+"/"+j.toString()}>
+                                                        <div style={{background: this.state.pathColors[i][j]}}  className="path"></div>
+                                                    </td>
+                                                )})}
+                                        </tr>        
+                                    )})}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="agenda-labels">
+                        <div className="small-box">
+                            <div> <div className="rectangle black"></div> - Impassable tile</div>
+                            <div> <div className="rectangle brown"></div> - Mountain = 1.5 cost of normal tile</div>
+                            <div> <div className="rectangle orange"></div> - Tiles to find a path</div>
+                            <div> <div className="rectangle green"></div> - Tiles visited by algorithm at least once</div>
+                            <div> <div className="rectangle purple"></div> - shortest path between points</div>
+                        </div>   
+                    </div>
                 </div>
-                <div className="as">
-                    <table className="labyrinth">
-                        <tbody>
-                            {Array.from(Array(this.state.rows), (e, i) => {
-                                return( 
-                                    <tr>
-                                        {Array.from(Array(this.state.columns), (e, j) => {
-                                            return(
-                                                <td onClick={(e)=> this.changeTerrain(e)} onMouseOver={(e)=> this.checkIfMouseIsPressed(e)} style={{background: this.state.colors[i][j]}} id={"pt"+i.toString()+"/"+j.toString()}>
-                                                    <div style={{background: this.state.pathColors[i][j]}}  className="path"></div>
-                                                </td>
-                                            )})}
-                                    </tr>        
-                                )})}
-                        </tbody>
-
-                    </table>
-                </div>
-
-
             </div>
         )
     }
