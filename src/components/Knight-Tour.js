@@ -10,6 +10,7 @@ export default class KnightTour extends React.Component {
             rows: 8,
             columns: 8,
             knightWasInThisTile: [],
+            aiTurn: true,
             rowNames: ["A", "B", "C", "D", "E", "F", "G", "H"],
             highlightTile: [],
             knightPosition: [0,0],
@@ -41,8 +42,8 @@ export default class KnightTour extends React.Component {
         }
     }
     
-    highlightPossibleTilesForKnight(e){
-        if(this.state.gameStarted===false) return
+    highlightPossibleTilesForKnight(){
+        if(!this.state.gameStarted || !this.state.canDragKnight) return
         
         let x = this.state.knightPosition[0]
         
@@ -56,7 +57,6 @@ export default class KnightTour extends React.Component {
             for(let j=0; j<secondAxisChange.length;j++){
                 let tileExist = 8 > x + firstAxisChange[i] && x + firstAxisChange[i] >= 0 && 8 > y + secondAxisChange[j] && y + secondAxisChange[j] >= 0
                 if(tileExist){
-                    console.log(x + firstAxisChange[i])
                     let tileWasNotVisited = !this.state.knightWasInThisTile[x + firstAxisChange[i]][y + secondAxisChange[j]]
                     if(tileWasNotVisited) copyArray[x + firstAxisChange[i]][y + secondAxisChange[j]] = true
                 }
@@ -109,8 +109,9 @@ export default class KnightTour extends React.Component {
         this.setState({labelColor: "blue"})
         this.setState({knightWasInThisTile: copyArray})
         this.setState({turn: 1})
-        await this.setState({labelDescription: "Game not started yet"})
-        await this.setState({gameStarted: false})
+        this.setState({canDragKnight: false})
+        this.setState({labelDescription: "Game not started yet"})
+        this.setState({gameStarted: false})
         this.clearHighlights()
         
     }
@@ -252,13 +253,17 @@ export default class KnightTour extends React.Component {
         localStorage.setItem("Best Score", this.state.turn)
     }
 
+
     render() {
         return (
             <div className="box">
-                <div style={{display: "inline-block"}}>
-                    <img onDragEnd={() => this.clearHighlights()} id="knight"  src={knight} alt="knight" draggable={this.state.canDragKnight} onDragStart={(e)=> this.highlightPossibleTilesForKnight(e)}  onClick={() => this.highlightPossibleTilesForKnight()}/>
-                        <div id="div1" onDrop={(e) => this.moveKnight(e)} onDragOver={(e) => this.allowDrop(e)}></div>
-                        <table className="ChessBoard">
+                <img onDragEnd={() => this.clearHighlights()} id="knight" 
+                    src={knight} alt="knight" draggable={this.state.canDragKnight} 
+                    onDragStart={(e)=> this.highlightPossibleTilesForKnight(e)}  
+                    onClick={() => this.highlightPossibleTilesForKnight()}/>
+                <div className="grid-container chess-grid">
+                    <div className="chessBoard-div" >
+                        <table className="chessBoard">
                             <caption style={{background: this.state.labelColor}} >{this.state.labelDescription}</caption>
                             <tbody>
                                 {Array.from(Array(this.state.rows), (e, i) => {
@@ -266,23 +271,28 @@ export default class KnightTour extends React.Component {
                                         <tr key={i}>
                                             {Array.from(Array(this.state.columns), (e, j) => {
                                                 return(
-                                                    <td key={i+j} id={"tile"+i.toString()+"/"+j.toString()} onClick={(e) => this.placeKnight(e)} onDrop={(e) => this.getCoordinates(e)} onDragOver={(e) => this.allowDrop(e)}>
+                                                    <td key={i+j} id={"tile"+i.toString()+"/"+j.toString()} 
+                                                    onClick={(e) => this.placeKnight(e)} onDrop={(e) => this.getCoordinates(e)} onDragOver={(e) => this.allowDrop(e)}>
                                                             {this.state.knightWasInThisTile[i][j]  &&<div className="forbiddenMoves"></div>}
                                                             {this.state.highlightTile[i][j]  &&<div className="allowedMoves"></div>}
                                                     </td>
-                                                )})}
+                                                )
+                                            })}
                                             <td >{8-(i)}</td>
                                         </tr>          
-                                    )})}
-                                    <tr>
-                                        {this.state.rowNames.map((value, index2) => {
-                                            return(
-                                                <td >{value}</td>
-                                            )
-                                        })}
-                                    </tr>
+                                    )
+                                })}
+                                <tr>
+                                    {this.state.rowNames.map((value, index2) => {
+                                        return(
+                                            <td key={index2} >{value}</td>
+                                        )
+                                    })}
+                                </tr>
                             </tbody>
                         </table>
+                    </div>    
+                    <div className="labels">
                         <div className="right">
                             <div className="very-small-box">
                                 Best Score: Loss {this.state.bestScore}
@@ -294,10 +304,13 @@ export default class KnightTour extends React.Component {
                             <button onClick={()=> this.reset()} className="button create">Reset</button>
                         </div>
                     </div>
-                    <div className="small-box">
-                        <h3>Rules of Game: </h3>
-                        Place knight on tile and press start. Then Ai will move knight to different tile, then it is your turn. You/Ai cannot move knight to tile that was already visited. Red boxes on tiles symbolize, that this tile was already visited. First player that cannot find a move loses.
-                    </div>                
+                    <div className="label-rules">
+                        <div className="small-box">
+                            <h3>Rules of Game: </h3>
+                            Place knight on tile and press start.Ai will move knight to different tile, then it is your turn. You/Ai cannot move knight to tile that was already visited. Red boxes on tiles symbolize, that this tile was already visited. First player that cannot find a move loses.
+                        </div> 
+                    </div> 
+                </div>              
             </div>
         )
     }
