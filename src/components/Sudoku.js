@@ -653,7 +653,7 @@ export default class Sudoku extends React.Component {
 render() {
     return (
         <div className="box">
-            <div className="grid-container">
+            <div className="grid-container sudoku-grid">
                 <div className="sudoku-div">
                     <table  className="sudokuTable">
                         <caption style={{background: this.state.captionColor}} >{this.state.caption}</caption>

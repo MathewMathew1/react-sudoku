@@ -39,12 +39,9 @@
   text-align: right
 }
 
-.sudoku-div { grid-area: table; }
-.buttons-div{ grid-area: buttonArea;}
-.label-area{ grid-area: labelArea }
-.explaining-labels {grid-area: smallBox}
 
-.explaining-labels{
+
+.explaining-labels, .label-rules{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -53,15 +50,33 @@
 .grid-container {
   width: 600px;
   display: grid;
-  grid-template-areas:
-  'table table smallBox'
-  'buttonArea buttonArea -'
-  'labelArea labelArea -';
-  
   grid-gap: 10px;
   
   padding: 10px;
 }
+
+.sudoku-grid{
+  grid-template-areas:
+  'table table smallBox'
+  'buttonArea buttonArea -'
+  'labelArea labelArea -';
+}
+
+
+.label-rules{grid-area: smallBox;}
+.chessBoard-div{grid-area: table;}
+.labels{grid-area: labelArea;}
+
+.chess-grid{
+  grid-template-areas:
+  'table table  smallBox'
+  'labelArea labelArea -';
+}
+
+.sudoku-div { grid-area: table; }
+.buttons-div{ grid-area: buttonArea;}
+.label-area{ grid-area: labelArea }
+.explaining-labels {grid-area: smallBox}
 
 .sudokuTable { 
   border-collapse: collapse; 
@@ -77,7 +92,7 @@
   position: relative;
 }
 
-.ChessBoard{
+.chessBoard{
   margin-top: 2rem;
   border-collapse: collapse;
   position: relative;
@@ -107,7 +122,7 @@ table.labyrinth  td {
   top: 50%;
 }
 
-table.ChessBoard  td{
+table.chessBoard  td{
   height: 2.5em; 
   width: 2.5em; 
   border-color: black;
@@ -118,15 +133,15 @@ table.ChessBoard  td{
   padding: 0;
 }
 
-.ChessBoard tr:nth-child(odd) td:nth-child(even){
+.chessBoard tr:nth-child(odd) td:nth-child(even){
   background-color: rgb(241, 242, 243);
 }
 
-.ChessBoard tr:nth-child(even) td:nth-child(odd){
+.chessBoard tr:nth-child(even) td:nth-child(odd){
   background-color: rgb(241, 242, 243);
 }
 
-.ChessBoard td:nth-child(9) {
+.chessBoard td:nth-child(9) {
   width: 1.0em;
   user-select: none;
   -webkit-user-select: none; /* Safari */        
@@ -147,7 +162,7 @@ table.ChessBoard  td{
   
 }
 
-.ChessBoard tr:nth-child(9) td{
+.chessBoard tr:nth-child(9) td{
   height: 0.8em;
   user-select: none;
   -webkit-user-select: none; /* Safari */        
