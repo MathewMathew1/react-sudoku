@@ -83,7 +83,7 @@ export default class Sudoku extends React.Component {
       
 
     componentDidMount(){
-        let numbers = [[0, 0, 0, 0, 999, 0, 0, 0, 0], [0, 1, 8, 7, 0, 0, 0, 0, 0], [4, 0, 0, 8, 0, 0, 0, 0, 1],
+        let numbers = [[0, 0, 0, 0, 9, 0, 0, 0, 0], [0, 1, 8, 7, 0, 0, 0, 0, 0], [4, 0, 0, 8, 0, 0, 0, 0, 1],
         [0, 6, 0, 0, 0, 8, 0, 0, 0], [1, 0, 0, 4, 0, 0, 3, 0, 0], [0, 7, 0, 0, 0, 0, 8, 2, 9],
         [0, 2, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 9, 0, 4, 2, 7, 0], [6, 0, 0, 0, 5, 0, 1, 0, 0]]
         this.setState({numbersSudoku: numbers})  
@@ -653,53 +653,54 @@ export default class Sudoku extends React.Component {
 render() {
     return (
         <div className="box">
-            <div style={{display: "inline-block"}}>
-                <div style={{display: "inline-block"}}>
+            <div className="grid-container">
+                <div className="sudoku-div">
                     <table  className="sudokuTable">
                         <caption style={{background: this.state.captionColor}} >{this.state.caption}</caption>
                         <colgroup><col/><col/><col/></colgroup>
                         <colgroup><col/><col/><col/></colgroup>
                         <colgroup><col/><col/><col/></colgroup>
                         <tbody>
-                                {this.state.numbersSudoku.map((_value, index) => {
-                                    return( 
-                                        <tr key={index}>
-                                            {this.state.numbersSudoku[index].map((value, index2) => {
-                                                if(this.state.numbersSudoku[index][index2]!==0) 
-                                                    return(
-                                                    <td key={index2} id={"sd"+index.toString()+index2.toString()} style={{color: this.state.colors[index][index2]}}>{value}</td>
-                                                    )
-                                                else if(this.state.potentialNumbers[index][index2].length===0) {
-                                                    return (
-                                                        <td key={index2}></td>
-                                                    )
-                                                }
-                                                else{
-                                                    return(
-                                                    <td key={index2}>
-                                                        <span className="potential_numbers">
-                                                            {this.state.potentialNumbers[index][index2].join(" ")}
-                                                        </span>
-                                                        
-                                                    </td>   
-                                                    )
-                                                }  
-                                            })}
-                                    </tr>)
+                            {this.state.numbersSudoku.map((_value, index) => {
+                                return( 
+                                    <tr key={index}>
+                                        {this.state.numbersSudoku[index].map((value, index2) => {
+                                            if(this.state.numbersSudoku[index][index2]!==0) 
+                                                return(
+                                                <td key={index2} id={"sd"+index.toString()+index2.toString()} style={{color: this.state.colors[index][index2]}}>{value}</td>
+                                                )
+                                            else if(this.state.potentialNumbers[index][index2].length===0) {
+                                                return (
+                                                    <td key={index2}></td>
+                                                )
+                                            }
+                                            else{
+                                                return(
+                                                <td key={index2}>
+                                                    <span className="potential_numbers">
+                                                        {this.state.potentialNumbers[index][index2].join(" ")}
+                                                    </span>
+                                                    
+                                                </td>   
+                                                )
+                                            }  
+                                        })}
+                                </tr>)
                             })}
                         </tbody>
-                    </table>    
-                    <div className="right">
-                        <button disabled={this.state.buttonDisable} onClick={()=> this.openModal()} className="button add">Create</button>
-                        <button disabled={this.state.buttonDisable} onClick={()=> this.newSudoku()} className="button create">New</button>
-                        <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
-                    </div>
-                    
-                        <div style={{display: "inline_block"}}>
+                    </table>
+                </div>    
+                <div className="right buttons-div">
+                    <button disabled={this.state.buttonDisable} onClick={()=> this.openModal()} className="button add">Create</button>
+                    <button disabled={this.state.buttonDisable} onClick={()=> this.newSudoku()} className="button create">New</button>
+                    <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
+                </div>
+                    <div className="label-area">
+                        <div >
                             Speed of solving :   {this.state.speed}
                             <input type="range" min="0" max="4" value={this.state.speed} onChange={this.handleChange}  id="myRange"></input>
                         </div>
-                        <div style={{display: "inline_block"}}>
+                        <div >
                             Method of solving :  &nbsp;
                             <label className="switch"  >
                                 <input onClick={()=>this.changeMethodOfSolving()} type="checkbox"/>
@@ -707,18 +708,20 @@ render() {
                             </label>
                         </div>
                     </div>
-                    
-                    <div className="small-box">
-                        
-                        <div> <div className="rectangle black"></div> - Base numbers</div>
-                        <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
-                        <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>
-                        <div> <div className="rectangle green"></div> - Single possibility in area</div>
-                    </div>    
-                </div> 
-                <NewSudokuModal changeSudoku={this.changeSudoku} closeModal={this.closeModal} modalIsOpen={this.state.modalIsOpen} />
-            </div>
-      
+                    <div className="explaining-labels">
+                        <div className="small-box">
+                            <div> <div className="rectangle black"></div> - Base numbers</div>
+                            <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
+                            <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>
+                            <div> <div className="rectangle green"></div> - Single possibility in area</div>
+                        </div>   
+                    </div>
+                </div>
+                
+                 
+            <NewSudokuModal changeSudoku={this.changeSudoku} closeModal={this.closeModal} modalIsOpen={this.state.modalIsOpen} />
+        </div>
+    
     );
   }
 }
