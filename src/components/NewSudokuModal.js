@@ -175,6 +175,7 @@ export default class NewSudokuModal extends React.Component {
                         background: '#fff',
                         WebkitOverflowScrolling: 'touch',
                         borderRadius: '4px',
+                        inset: '0',
                         outline: 'none',
                         padding: '20px'
                     }
