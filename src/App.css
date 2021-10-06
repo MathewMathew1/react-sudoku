@@ -50,7 +50,7 @@
 
 
 .grid-container {
-  width: 600px;
+  
   display: grid;
   grid-gap: 10px;
   
@@ -101,7 +101,7 @@
   font-family:  sans-serif; 
   position: relative;
   margin-right: 50px; 
-
+  
 }
 
 .labyrinth{
@@ -114,6 +114,7 @@
   margin-top: 2rem;
   border-collapse: collapse;
   position: relative;
+  
 }
 
 .button:disabled {
@@ -318,10 +319,10 @@ table.sudokuTable caption{
 .small-box{
   height:auto;
   margin: 0;
-  
+  max-width: 300px;
   
   border-color: #111;
-  padding: 0.2rem;
+  padding: 0.5rem;
   font-size: 1rem;
   border-style: ridge;
   text-align: left;

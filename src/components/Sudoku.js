@@ -43,10 +43,7 @@ export default class Sudoku extends React.Component {
             numberListArranged: [],
             sleepTime: 0,
             creationMode: false,
-            totalTime: 0,
             wayOfSolving: "Backtracking",
-            startTime: Date(),
-            finishTime: Date(),
             colors: [],
             modalIsOpen: false,
             solutionToSudoku: []
@@ -73,14 +70,6 @@ export default class Sudoku extends React.Component {
         }
         return
     }
-
-    
-
-    handleChange = (e) => {
-        this.setState({ speed: e.target.value });
-      };
-    
-      
 
     componentDidMount(){
         let numbers = [[0, 0, 0, 0, 9, 0, 0, 0, 0], [0, 1, 8, 7, 0, 0, 0, 0, 0], [4, 0, 0, 8, 0, 0, 0, 0, 1],
@@ -167,16 +156,9 @@ export default class Sudoku extends React.Component {
     async changeColor(x, y, color){
         let colorsCopy = this.state.colors
         colorsCopy[x][y] = color
-        await this.setState({colors: colorsCopy})
+        this.setState({colors: colorsCopy})
         return
     }
-
-    async calculateTotalTime(){
-        const diffTime = Math.abs(this.state.startTime - this.state.finishTime);
-        const diffSeconds = Math.floor(diffTime / (1000));
-        this.setState({totalTime: diffSeconds})
-    }
-
 
     async changeColorsOfAll(){
         let colorsCopy = this.state.colors
@@ -212,9 +194,9 @@ export default class Sudoku extends React.Component {
             await this.setState({captionColor: "red"})
         }
         await this.setState({sleepTime: 0})
-        this.startTime = Date.now()
         await this.setState({creationMode: false})
         if(this.state.wayOfSolving==="Backtracking"){
+            this.setState({captionColor: "red"})
             this.setState({caption: "Brute force"})
             await this.changeColorsOfAll()
             await this.solveSudoku(this.state.numbersSudoku)
@@ -222,7 +204,7 @@ export default class Sudoku extends React.Component {
         else{
             await this.getPossibilities(this.state.numbersSudoku)
         }
-        this.calculateTotalTime()
+        
         
         await this.setState({buttonDisable: false})
         // this.getPossibilities(this.state.numberSudoku)
@@ -287,8 +269,8 @@ export default class Sudoku extends React.Component {
     async solo(sudoku){
         if(!this.state.creationMode){
             await this.sleep(125)
-            await this.setState({captionColor: "green"})
-            await this.setState({caption: "Looking for single possibility in tile"})
+            this.setState({captionColor: "green"})
+            this.setState({caption: "Looking for single possibility in tile"})
         }
         for (var x = 0; x < 9; x++) {
             for (var y = 0; y < 9; y++) {
@@ -311,8 +293,8 @@ export default class Sudoku extends React.Component {
         while (this.state.known < 81){
             let baseKnown = this.state.known
             if(!this.state.creationMode){
-                await this.setState({captionColor: "green"})
-                await this.setState({caption: "Checking for single possibility in row/col/square"})
+                this.setState({captionColor: "green"})
+                this.setState({caption: "Checking for single possibility in row/col/square"})
             }
             for (let a = 1; a < 10; a++) {
                 for (let x = 0; x < 9; x++) {
@@ -387,34 +369,39 @@ export default class Sudoku extends React.Component {
                 await this.sleep(75)
             }
             if( toRepeat === 10){
-                await this.setState({caption: "Unable to solve Sudoku"})
+                this.setState({caption: "Unable to solve Sudoku"})
                 return
             }
         }
-        await this.setState({caption: "Finished"})
-        await this.setState({captionColor: "pink"})
+        
+        this.setState({caption: "Finished"})
+        this.setState({captionColor: "pink"})
+       
         return
     }
 
     async hard(){
         await this.sleep(75)
         if(!this.state.creationMode){
-            await this.setState({captionColor: "purple"})
-            await this.setState({caption: "Removing blocked numbers"})  
+            this.setState({captionColor: "purple"})
+            this.setState({caption: "Removing blocked numbers"})  
         }
         for (let a = 1; a < 10; a++) {
             for (let x = 1; x < 4; x++) {
                 for (let y = 1; y < 4; y++) {      
+                    
                     let squareEdges = [0, 0, 0, 0]
                     let howManyNumbers = 0
                     let blockadeX = true
                     let blockadeY = true
                     let whatX = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     let whatY = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    
                     squareEdges[0] = (x - 1) * 3 + 1 
                     squareEdges[1] = (y - 1) * 3 + 1
                     squareEdges[2] = (x - 1) * 3 + 4
                     squareEdges[3] = (y - 1) * 3 + 4
+                    
                     for (var i = squareEdges[0]; i < squareEdges[3]; i++) { //c
                         for (var j = squareEdges[1]; j < squareEdges[2]; j++) { //d
                             if(!containsObject(this.state.potentialNumbers[i-1][j-1], a)) continue
@@ -431,26 +418,30 @@ export default class Sudoku extends React.Component {
                             }
                         }
                     }
+                    
                     let doesNumberHavePossibleTilesOnlyWithSameXInSqaure = blockadeX === true && howManyNumbers > 0
                     if (doesNumberHavePossibleTilesOnlyWithSameXInSqaure){
                         for (let d = 0; d < 9; d++){
-                            let numbersIsPosiblityInTileWhichIsNotInTheSameSquare = containsObject(this.state.potentialNumbers[whatX[0]][d], a)&& ! containsObject(whatY,d)
+                            let numbersIsPosiblityInTileWhichIsNotInTheSameSquare = containsObject(this.state.potentialNumbers[whatX[0]][d], a)
+                            && ! containsObject(whatY,d)
                             if(numbersIsPosiblityInTileWhichIsNotInTheSameSquare){
                                 let copyArray = this.state.potentialNumbers
                                 copyArray[whatX[0]][d] = remove(copyArray[whatX[0]][d], a)
-                                await this.setState({potentialNumbers: copyArray})
-                               
+                                this.setState({potentialNumbers: copyArray})
                             }
                         }
                     }
                     let doesNumberHavePossibleTilesOnlyWithSameYInSqaure = blockadeY === true && howManyNumbers > 0
                     if(doesNumberHavePossibleTilesOnlyWithSameYInSqaure){  
                         for (let d = 0; d < 9; d++){
-                            let numbersIsPosiblityInTileWhichIsNotInTheSameSquare = containsObject(this.state.potentialNumbers[d][whatY[0]], a)&& !containsObject(whatX,d)
+                            
+                            let numbersIsPosiblityInTileWhichIsNotInTheSameSquare = containsObject(this.state.potentialNumbers[d][whatY[0]], a)
+                                && !containsObject(whatX,d)
                             if(numbersIsPosiblityInTileWhichIsNotInTheSameSquare){
+                                
                                 let copyArray = this.state.potentialNumbers
                                 copyArray[d][whatY[0]] = remove(copyArray[d][whatY[0]], a)
-                                await this.setState({potentialNumbers: copyArray})
+                                this.setState({potentialNumbers: copyArray})
                                
                             }
                         }
@@ -460,19 +451,26 @@ export default class Sudoku extends React.Component {
         }
         for (let a = 1; a < 10; a++) {  
             for (let x = 0; x < 9; x++) {
+                
                 let squareEdges = [0, 0, 0, 0]
                 let howManyNumbers = 0
                 let blockadeY = true
                 let whatY = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                
                 for (let y = 0; y < 9; y++) {
+                    
                     if(!containsObject(this.state.potentialNumbers[x][y], a)) continue
+                    
                     whatY[howManyNumbers] = y
                     howManyNumbers = howManyNumbers + 1
+                    
                     if (howManyNumbers > 1){
+                       
                         squareEdges[0] = (whatY[howManyNumbers - 1] + 3) % 3
                         squareEdges[1] = (whatY[howManyNumbers - 2] + 3) % 3  // checking if both numbers belong to the same square
                         squareEdges[0] = whatY[howManyNumbers - 1]  - squareEdges[0]
                         squareEdges[1] = whatY[howManyNumbers - 2]  - squareEdges[1]
+                       
                         if (squareEdges[1] !== squareEdges[0]){
                             blockadeY = false
                             break
@@ -481,18 +479,22 @@ export default class Sudoku extends React.Component {
                 }
                 let doesNumberHavePossibleTilesInOneSquareInColumn = blockadeY === true && howManyNumbers > 0
                 if (doesNumberHavePossibleTilesInOneSquareInColumn){
+                    
                     squareEdges[0] = (x + 3) % 3
                     squareEdges[1] = (whatY[0] + 3) % 3
                     squareEdges[0] = x - squareEdges[0]
                     squareEdges[1] = whatY[0] - squareEdges[1]  // finding beggining of og square of x and y
                     squareEdges[2] = squareEdges[1] + 3
                     squareEdges[3] = squareEdges[0] + 3
+                    
                     for (let c = squareEdges[0]; c < squareEdges[3]; c++){ // removes pos from square
                         for (let d = squareEdges[1]; d < squareEdges[2]; d++){  
                             if(containsObject(this.state.potentialNumbers[c][d], a) && !containsObject(whatY, d)){
+                                
                                 let copyArray = this.state.potentialNumbers
                                 copyArray[c][d] = remove(copyArray[c][d], a)
-                                await this.setState({potentialNumbers: copyArray})
+                                this.setState({potentialNumbers: copyArray})
+                            
                             }
                         }
                     }
@@ -501,19 +503,25 @@ export default class Sudoku extends React.Component {
         } // this loop and next should be created to function somehow
         for (let a = 1; a < 10; a++) { 
             for (let y = 0; y < 9; y++) { 
+                
                 let squareEdges = [0, 0, 0, 0]
                 let howManyNumbers = 0
                 let blockadeX = true
                 let whatX = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                
                 for (let x = 0; x < 9; x++) {
                     if(!containsObject(this.state.potentialNumbers[x][y], a)) continue
+                    
                     whatX[howManyNumbers] = x
                     howManyNumbers = howManyNumbers + 1
+                    
                     if (howManyNumbers > 1){
+                        
                         squareEdges[0] = (whatX[howManyNumbers - 1] + 3) % 3  // checking if both numbers belong to the same square
                         squareEdges[1] = (whatX[howManyNumbers - 2] + 3) % 3
                         squareEdges[0] = whatX[howManyNumbers - 1]  - squareEdges[0]
                         squareEdges[1] = whatX[howManyNumbers - 2]  - squareEdges[1]
+                        
                         if (squareEdges[1] !== squareEdges[0]){
                             blockadeX = false
                             break
@@ -522,18 +530,22 @@ export default class Sudoku extends React.Component {
                 }
                 let doesNumberHavePossibleTilesInOneSquareInRow = blockadeX === true && howManyNumbers > 0
                 if (doesNumberHavePossibleTilesInOneSquareInRow){
+                    
                     squareEdges[0] = (whatX[0] + 3) % 3
                     squareEdges[1] = y -(y + 3) % 3
                     squareEdges[0] = whatX[0] - squareEdges[0]  
                     squareEdges[2] = squareEdges[1] + 3
                     squareEdges[3] = squareEdges[0] + 3
+                    
                     for (let c = squareEdges[0]; c < squareEdges[3]; c++){ // removes pos from square
                         for (let d = squareEdges[1]; d < squareEdges[2]; d++){
-                            console.log(c+" "+d)
+                            
                             if(containsObject(this.state.potentialNumbers[c][d], a) && !containsObject(whatX, d)){
+                                
                                 let copyArray = this.state.potentialNumbers
                                 copyArray[c][d] = remove(copyArray[c][d], a)
-                                await this.setState({potentialNumbers: copyArray})
+                                this.setState({potentialNumbers: copyArray})
+                                
                                 return
                             }
                         }
@@ -546,23 +558,28 @@ export default class Sudoku extends React.Component {
 
 
     async arrangeNumber(){
+        
         let numberList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        let numberListArrangedC = []
+        let numberListArrangedCopy = []
         for (let i = 0; i < 9; i++){
             let a = getRandomNumber(0,9-i)
-            numberListArrangedC.push(numberList[a])
+            numberListArrangedCopy.push(numberList[a])
             numberList = remove(numberList, numberList[a])
         }
-        await this.setState({numberListArranged: numberListArrangedC})
+        
+        await this.setState({numberListArranged: numberListArrangedCopy})
     }
 
     async newSudoku(){
         this.setState({caption: "Sudoku Begin creating"})
+        this.setState({captionColor: "blue"})
         this.setState({buttonDisable: true})
         this.setState({creationMode: true})
+        
         let newCreatedSudoku = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        
         for (let i = 1; i < 10; i++){
             while(true){
                 let X_Place=getRandomNumber(0,9)
@@ -573,12 +590,14 @@ export default class Sudoku extends React.Component {
                 }    
             }
         }
+        
         newCreatedSudoku = await this.solveSudoku(newCreatedSudoku)
         let removedNumbers = []
         var X_to_remove = 0
         var Y_to_remove = 0
         var known = 81
         let a= 0
+        
         while(a<100){
             a += 1
             while(true){
@@ -624,6 +643,7 @@ export default class Sudoku extends React.Component {
         if(!findEmptyLocation(sudoku, tile)){
             return true
         }    
+        
         let row = tile[0]
         let col = tile[1]
         let l = this.state.numberListArranged.length
@@ -632,9 +652,10 @@ export default class Sudoku extends React.Component {
                 sudoku[row][col] = this.state.numberListArranged[i]
                 if(! this.state.creationMode){
                     if(this.state.speed !== 0){
+                        console.log(typeof(this.state.speed))
                         await this.sleep(25)
+                        this.setState({numbersSudoku: sudoku})
                     }
-                    await this.setState({numbersSudoku: sudoku})
                 }
                 if(await this.solveSudoku(sudoku)!==false){
                     if(this.state.creationMode){
@@ -645,7 +666,7 @@ export default class Sudoku extends React.Component {
                 sudoku[row][col] = 0
             }
         }       
-    return false
+        return false
     }
     
 
@@ -698,7 +719,8 @@ render() {
                     <div className="label-area">
                         <div >
                             Speed of solving :   {this.state.speed}
-                            <input type="range" min="0" max="4" value={this.state.speed} onChange={this.handleChange}  id="myRange"></input>
+                            <input type="range" min="0" max="4" value={this.state.speed} 
+                                onChange={ (e) => this.setState({ speed: parseInt(e.target.value) })}  id="myRange"></input>
                         </div>
                         <div >
                             Method of solving :  &nbsp;
