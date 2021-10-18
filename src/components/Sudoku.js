@@ -676,8 +676,8 @@ render() {
         <div className="box">
             <div className="grid-container sudoku-grid">
                 <div className="sudoku-div">
-                    <table  className="sudokuTable">
-                        <caption style={{background: this.state.captionColor}} >{this.state.caption}</caption>
+                    <table className="sudokuTable">
+                        <caption style={{background: this.state.captionColor, color: "white"}} >{this.state.caption}</caption>
                         <colgroup><col/><col/><col/></colgroup>
                         <colgroup><col/><col/><col/></colgroup>
                         <colgroup><col/><col/><col/></colgroup>

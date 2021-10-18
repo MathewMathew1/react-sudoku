@@ -264,7 +264,7 @@ export default class KnightTour extends React.Component {
                 <div className="grid-container chess-grid">
                     <div className="chessBoard-div" >
                         <table className="chessBoard">
-                            <caption style={{background: this.state.labelColor}} >{this.state.labelDescription}</caption>
+                            <caption style={{background: this.state.labelColor, color: "white"}} >{this.state.labelDescription}</caption>
                             <tbody>
                                 {Array.from(Array(this.state.rows), (e, i) => {
                                     return( 
