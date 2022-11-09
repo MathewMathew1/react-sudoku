@@ -50,7 +50,7 @@
 
 
 .grid-container {
-  
+  justify-content: center;
   display: grid;
   grid-gap: 10px;
   
