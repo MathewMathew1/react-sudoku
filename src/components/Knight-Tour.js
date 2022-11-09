@@ -251,6 +251,7 @@ export default class KnightTour extends React.Component {
     setBestScore(){
         if(this.state.turn < this.state.bestScore) return
         localStorage.setItem("Best Score", this.state.turn)
+        this.setState({bestScore: this.state.turn})
     }
 
 
