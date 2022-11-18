@@ -1,5 +1,5 @@
 import React from "react";
-import { getPartOfString, containsObject, sleep }  from "./functions";
+import { getPartOfString, containsObject, sleep } from "./helpers/helpers"
 import knight from "../knight.png"
 
 
@@ -40,6 +40,9 @@ export default class KnightTour extends React.Component {
         if(localStorage.getItem("Best Score")){
             this.setState({bestScore: localStorage.getItem("Best Score")})
         }
+
+        document.title = "Knight tour"
+      
     }
     
     highlightPossibleTilesForKnight(){
