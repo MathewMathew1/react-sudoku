@@ -170,9 +170,6 @@ export default class Pathfinder extends React.Component {
         if(this.state.pathColors[x][y]==="purple"){
             return
         }
-        if(this.state.tileset[x][y].color==="orange"){
-            console.log({x, y})
-        }
 
         this.setState((state)=> {
             let {pathColors} = state

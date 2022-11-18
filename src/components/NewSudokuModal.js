@@ -55,7 +55,6 @@ export default class NewSudokuModal extends React.Component {
         }
         
         let numberOfSolutions = await this.props.checkIfSolvable(copySudoku)
-        console.log(numberOfSolutions)
        
         this.setState({beingSolved: false})
         if(numberOfSolutions>1){
@@ -102,7 +101,6 @@ export default class NewSudokuModal extends React.Component {
             if(parseInt(element.id[3])+1<9){
                 let newId = this.setCharAt(element.id,3,parseInt(element.id[3])+1)
                 let newElement = document.getElementById(newId)
-                console.log(newElement)
                 newElement.focus()
             }
         }

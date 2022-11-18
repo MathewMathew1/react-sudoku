@@ -61,7 +61,6 @@ export default () => {
             
             let tile = [0, 0]
             if(!findEmptyLocation(sudoku, tile)){
-                console.log("RABADABA BUBU")
                 return true
             }    
         
@@ -182,9 +181,7 @@ export default () => {
                 for(let j=0; j<3; j++){
                     known += 1
                     newCreatedSudoku[removeValueFromArrayNumbers[removeValueFromArrayNumbers.length-1].x][removeValueFromArrayNumbers[removeValueFromArrayNumbers.length-1].y] = removeValueFromArrayNumbers[removeValueFromArrayNumbers.length-1].number
-                    console.log(removeValueFromArrayNumbers[removeValueFromArrayNumbers.length-1])
-                    removeValueFromArrayNumbers.pop()
-                    
+                    removeValueFromArrayNumbers.pop()             
                 }
         
             }
