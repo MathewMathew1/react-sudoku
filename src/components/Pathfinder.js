@@ -1,8 +1,8 @@
 
-
-
 import React from "react";
-import { sleep, getPartOfString } from "./functions";
+import { getPartOfString } from "./helpers/helpers"; 
+import PathfinderA from "./Pathinders/PathfinderA";
+import TILES from "./Pathinders/Tiles";
 
 export default class Pathfinder extends React.Component {
     constructor(props){
@@ -12,10 +12,8 @@ export default class Pathfinder extends React.Component {
             columns: 30,
             canAdd: true,
             buttonDisable: false,
-            whatToPlace: 0,
-            colorToWhatToPlace: ["black", "orange", "brown"],
-            pointForTerrain: {"white": 1, "brown": 3, "orange": 1,},
-            colors: [],
+            whatToPlace: TILES[0],
+            tileset: [],
             errors: [],
             points: [],
             gScore: [],
@@ -23,17 +21,28 @@ export default class Pathfinder extends React.Component {
             path: [],
             endingPoint: [],
             beginningPoint: [],
-            pathColors: []
+            pathColors: [],
+
         };
         
+        this.updatePathColor = this.updatePathColor.bind(this)
+        this.updateErrors = this.updateErrors.bind(this)
+        this.finishSolving = this.finishSolving.bind(this)
+        
         for(let i=0; i<this.state.rows; i++){
-            this.state.colors.push([])
+            this.state.tileset.push([])
             this.state.pathColors.push([])
+
+            const normalPath = TILES[0]
             for(let j=0; j<this.state.columns; j++){
-                this.state.colors[i].push("white")
+                this.state.tileset[i].push(normalPath)
                 this.state.pathColors[i].push("none")
             }
         }
+    }
+
+    componentDidMount(){
+        document.title = "Pathfinder"
     }
     
     checkIfMouseIsPressed= (e) => {
@@ -43,42 +52,61 @@ export default class Pathfinder extends React.Component {
         this.changeTerrain(e)
     }
 
+    removePoint(x, y){
+        
+        let indexOfRemovePoint = this.state.points.findIndex(point => point.x === x && point.y === y)
+        let textNode = this.state.points[indexOfRemovePoint].content
+        textNode.parentNode.removeChild(textNode);
+
+        this.state.points.forEach((point, index) => {
+
+            if(index <= indexOfRemovePoint) return
+
+            let textNode = this.state.points[index].content
+            
+            textNode.nodeValue = index
+        })
+        this.setState(prevState => ({
+            points: prevState.points.filter((item) => item.x !== x || item.y !== y)
+        }))
+
+
+    }
+
     changeTerrain(e){
-        if(this.state.whatToPlace===0 || this.state.canAdd===false){
-            return
-        }
         let x = getPartOfString(e.target.id, `pt`, 1)
         x = parseInt(getPartOfString(x, `/`, 0))
         let y = parseInt(getPartOfString(e.target.id, `/`, 1))
-        let copyArray = this.state.colors
-        if(copyArray[x][y]!==this.state.colorToWhatToPlace[this.state.whatToPlace-1]){
-            copyArray[x][y] = this.state.colorToWhatToPlace[this.state.whatToPlace-1]
-            if(this.state.colorToWhatToPlace[this.state.whatToPlace-1]==="orange"){
-                
-                let copyPoints = this.state.points
-                copyPoints.push([x,y])
-                this.setState({points: copyPoints})
 
-                e.target.innerHTML += copyPoints.length
-            }
-            else{
-                let copyPoints = this.state.points
-                copyPoints= this.remove(copyPoints, [x,y])
-                this.setState({points: copyPoints})
-            }
+        if(this.state.canAdd===false) return
+
+        if(this.state.tileset[x][y].color==="orange"){
+            this.removePoint(x, y)
         }
-        else{
-            copyArray[x][y] = "white"
-            if(this.state.colorToWhatToPlace[this.state.whatToPlace-1]==="orange"){
-                let copyPoints = this.state.points
-                copyPoints= this.remove(copyPoints, [x,y])
-                this.setState({points: copyPoints})
-                
-                
-                e.target.innerHTML = ""
-            }    
+
+        if(this.state.tileset[x][y].color===this.state.whatToPlace.color){
+            this.setState((state)=>{
+                let {tileset} = state
+                tileset[x][y] = TILES[0]
+                return {...state, tileset}
+            })   
+
+            return
+        } 
+
+        
+        
+        if(this.state.whatToPlace.color==="orange"){
+            var content = document.createTextNode(`${this.state.points.length + 1}`);
+            e.target.appendChild(content) 
+            this.setState({points: [...this.state.points, {x: x, y: y, content: content}]})
         }
-        this.setState({colors: copyArray})
+
+        this.setState((state)=>{
+            let {tileset} = state
+            tileset[x][y] = this.state.whatToPlace
+            return {...state, tileset}
+        })   
 
     }      
     
@@ -91,278 +119,92 @@ export default class Pathfinder extends React.Component {
         return arraY
     }
 
-    componentDidMount(){
-        let gCopy = this.state.gScore
-        let fCopy = this.state.fScore
-        let pathCopy = this.state.path
-        for(let x=0; x<this.state.rows; x++){
-            gCopy.push([])
-            fCopy.push([])
-            pathCopy.push([])
-            for(let y=0; y<this.state.columns;y++){
-                gCopy[x].push([])
-                fCopy[x].push([]) //this.countingFScore(x,y, this.state.points[0])
-                pathCopy[x].push([])
-            }
-        }
-        this.setState({gScore: gCopy})
-        this.setState({fScore: fCopy})
-        this.setState({path: pathCopy})
+    cleanPath(){
+        this.setState((state)=>{
+            let {pathColors} = state
+
+            pathColors.forEach((color, index)=>{
+                pathColors[index].forEach((color2, index2)=>{
+                    pathColors[index][index2] = "none"
+                })
+            })
+            return {pathColors}
+        })
     }
 
     cleanTiles(){
-        
-        let copyArray = this.state.colors
+        let tilesetNew = []
+
         for(let i=0; i<this.state.rows; i++){
+            tilesetNew.push([])
+
+
             for(let j=0; j<this.state.columns; j++){
-                copyArray[i][j]="white"
+                tilesetNew[i].push(TILES[0])
             }
         }
-        this.setState({colors: copyArray})
-        
-        let copyPathColors = this.state.pathColors
-        for(let i=0; i<this.state.rows; i++){
-            for(let j=0; j<this.state.columns; j++){
-                copyPathColors[i][j]="none"
-            }
-        }
-        
         for(let i=0; i<this.state.points.length; i++){
-            let x = this.state.points[i][0]
-            let y = this.state.points[i][1]
-            let id = "pt"+x.toString()+"/"+y.toString()
-            document.getElementById(id).innerHTML = ""
+            let textNode = this.state.points[i].content
+            textNode.parentNode.removeChild(textNode);
         }
-        
+
         this.setState({points: []})
-        this.setState({pathColors: copyPathColors})
+
+        this.cleanPath()
+        this.setState({tileset: tilesetNew})
     }
 
     async findPath(){
-        if(this.state.points.length<2){
-            this.setState({errors: ["At least two points needed to find a path"]})
-            return
-        }
-        for(let i=0;i<this.state.points.length-1;i++){
-            
-            this.setState({canAdd: false})
-            this.setState({errors: []})
-            this.setState({buttonDisable: true})
-            // find path
-            
-            let gCopy = this.state.gScore
-            let fCopy = this.state.fScore
-            let pathCopy = this.state.path
-            
-            for(let x=0; x<this.state.rows; x++){
-                for(let y=0; y<this.state.columns;y++){
-                    gCopy[x][y]=Infinity
-                    fCopy[x][y]=this.countingFScore(x,y, this.state.points[1])
-                    pathCopy[x][y]=[]
-                }
-            }
-            
-            gCopy[this.state.points[i][0]][this.state.points[i][1]] = 0
-            this.setState({gScore: gCopy})
-            this.setState({fScore: fCopy})
-            this.setState({path: pathCopy})
-            
-            await this.setState({beginningPoint: this.state.points[i]})
-            await this.setState({endingPoint: this.state.points[i+1]})
-            await this.updateNeighbors(this.state.points[i][0], this.state.points[i][1])
-
-            let foundPath = this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]!==Infinity
-            if(foundPath){
-                this.ReconstructPath(this.state.endingPoint[0], this.state.endingPoint[1])
-            }
-            else{this.setState({errors: ["No path found"]})}
-            this.setState({buttonDisable: false})
-            this.setState({canAdd: true})
-        }
-        return
+        this.cleanPath()
+        this.setState({buttonDisable: true})
+        this.setState({canAdd: false})
+        let Pathfinder = new PathfinderA(this.state.rows, this.state.columns, this.state.points, this.updatePathColor, this.updateErrors, this.state.tileset, this.finishSolving)
+        Pathfinder.solveMaze()
     }
     
-    async updateColor(x,y,color){
-        let copyColors = this.state.colors
-        copyColors[x][y]=color
-        await this.setState({colors: copyColors})
-        await sleep("30ms")
-        return
+    async updateErrors(errorMessage){
+        this.setState({errors: [errorMessage]})
     }
 
     async updatePathColor(x,y,color){
-        let copyColors = this.state.pathColors
-        if(copyColors[x][y]==="purple"){
+        if(this.state.pathColors[x][y]==="purple"){
             return
         }
-        copyColors[x][y]=color
-        
-        await this.setState({pathColors: copyColors})
-        await sleep("25ms")
+        if(this.state.tileset[x][y].color==="orange"){
+            console.log({x, y})
+        }
+
+        this.setState((state)=> {
+            let {pathColors} = state
+            pathColors[x][y] = color
+            return {...state, pathColors: pathColors}
+        })
+ 
         return
     }
 
-    updatePath(x,y,newX,newY){
-        let pathCopy = this.state.path
-        pathCopy[x][y]=[newX,newY]
-        this.setState({path: pathCopy})
+    finishSolving(){
+        this.setState({canAdd: true})
+        this.setState({buttonDisable: false})
     }
 
-    async updateNeighbors(x, y){
-        if(x>this.state.endingPoint[0]){
-            await this.goDown(x,y)
-            if(y>this.state.endingPoint[1]){
-                await this.goLeft(x,y)
-                await this.goRight(x,y)
-                await this.goUp(x,y)
-            }
-            else{
-                await this.goRight(x,y)
-                await this.goUp(x,y)
-                await this.goLeft(x,y)
-            }
-        }
-        else if(x<this.state.endingPoint[0]){
-            await this.goUp(x,y)
-            if(y>this.state.endingPoint[1]){
-                await this.goLeft(x,y)
-                await this.goRight(x,y)
-                await this.goDown(x,y)
-            }
-            else{
-                await this.goRight(x,y)
-                await this.goDown(x,y)
-                await this.goLeft(x,y)
-            }
-        }
-        else if(y>this.state.endingPoint[1]){
-            await this.goLeft(x,y)
-            await this.goUp(x,y)
-            await this.goDown(x,y)
-            await this.goRight(x,y)
-        }
-        else{
-            await this.goRight(x,y)
-            await this.goLeft(x,y)
-            await this.goUp(x,y)
-            await this.goDown(x,y)
-        }
+    handleChange(e) {
+        this.setState({whatToPlace: TILES[e.target.value]});
     }
     
-    async goDown(x,y){
-        if( x > 0 ){  // DOWN
-            if(this.state.colors[x-1][y]!== 'black'){
-                let point = this.state.pointForTerrain[this.state.colors[x-1][y]]
-                if(this.state.gScore[x - 1][y] > this.state.gScore[x][y] + point){
-                    
-                    let copyGScore = this.state.gScore    
-                    copyGScore[x-1][y] = copyGScore[x][y]+point
-                    await this.updatePathColor(x-1,y,"green")
-                    await this.setState({gScore: copyGScore})  
-                    
-                    this.updatePath(x-1, y, x, y)
-                    if (this.state.gScore[x - 1][y] + this.state.fScore[x - 1][y] < this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]){
-                        if (x - 1 !== this.state.endingPoint[0] || y !== this.state.endingPoint[1]){
-                            await this.updateNeighbors(x - 1, y)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    async goUp(x,y){
-        if( x+1 < this.state.rows){  // Up
-            if(this.state.colors[x+1][y]!== 'black'){
-                let point = this.state.pointForTerrain[this.state.colors[x+1][y]]
-                if(this.state.gScore[x + 1][y] > this.state.gScore[x][y] + point){
-                    
-                    let copyGScore = this.state.gScore    
-                    copyGScore[x+1][y] = copyGScore[x][y]+point
-                    await this.updatePathColor(x+1,y,"green")
-                    await this.setState({gScore: copyGScore})  
-                    
-                    this.updatePath(x+1, y, x, y)
-                    if (this.state.gScore[x + 1][y] + this.state.fScore[x + 1][y] < this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]){
-                        if (x + 1 !== this.state.endingPoint[0] || y !== this.state.endingPoint[1]){
-                            await this.updateNeighbors(x + 1, y)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    async goLeft(x,y){
-        if( y > 0){  // down
-            if(this.state.colors[x][y-1]!== 'black'){
-                let point = this.state.pointForTerrain[this.state.colors[x][y-1]]
-                if(this.state.gScore[x][y-1] > this.state.gScore[x][y] + point){
-                    
-                    let copyGScore = this.state.gScore    
-                    copyGScore[x][y-1] = copyGScore[x][y]+point
-                    await this.updatePathColor(x,y-1,"green")
-                    await this.setState({gScore: copyGScore})  
-                    
-                    this.updatePath(x, y-1, x, y)
-                    if (this.state.gScore[x][y-1] + this.state.fScore[x][y-1] < this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]){
-                        if (x !== this.state.endingPoint[0] || y-1 !== this.state.endingPoint[1]){
-                            await this.updateNeighbors(x, y-1)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    async goRight(x,y){
-        if( y+1 < this.state.columns){// up 
-            if(this.state.colors[x][y+1]!== 'black'){         
-                let point = this.state.pointForTerrain[this.state.colors[x][y+1]] 
-                if(this.state.gScore[x][y+1] > this.state.gScore[x][y] + point){
-                    
-                    let copyGScore = this.state.gScore    
-                    copyGScore[x][y+1] = copyGScore[x][y]+point
-                    this.updatePathColor(x,y+1,"green")
-                    await this.setState({gScore: copyGScore})  
-                    
-                    this.updatePath(x, y+1, x, y)
-                    if (this.state.gScore[x][y+1] + this.state.fScore[x][y+1] < this.state.gScore[this.state.endingPoint[0]][this.state.endingPoint[1]]){
-                        if (x !== this.state.endingPoint[0] || y+1 !== this.state.endingPoint[1]){
-                            await this.updateNeighbors(x, y+1)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    ReconstructPath(x, y){
-        this.updatePathColor(x,y,"purple")
-        if(x !== this.state.beginningPoint[0] || y !== this.state.beginningPoint[1]){
-            this.ReconstructPath(this.state.path[x][y][0], this.state.path[x][y][1])
-        }    
-    }
-
-    countingFScore(x, y, point){
-        return Math.abs(x - point[0]) + Math.abs(y - point[1])
-    }
-
-    handleChange(event) {
-        this.setState({whatToPlace: event.target.value});
-    }
-
+    
     render() {
         return (
             <div className="box">
                 <div className="grid-container path-grid">
                     <div className="button-area">
                         <div className="custom-select">   
-                            <select value={this.state.whatToPlace} onChange={(e) =>this.handleChange(e)}>
-                                <option value="0">What to place:</option>
-                                <option value="1">Blockade</option>
-                                <option value="2">Starting point</option>
-                                <option value="3">Mountain</option>
+                            <select  onChange={(e) => this.handleChange(e)}>
+           
+                                {TILES.map((value, index) => {
+                                     return( 
+                                        <option  key={`tiles ${index}`} value={index}>{value.name}</option>        
+                                    )})}
                             </select>
                         </div>
                         <button disabled={this.state.buttonDisable} onClick={()=> this.findPath()} className="button solve">Solve</button>
@@ -377,12 +219,12 @@ export default class Pathfinder extends React.Component {
                     <div className="labyrinth-div">
                         <table className="labyrinth">
                             <tbody>
-                                {Array.from(Array(this.state.rows), (_e, i) => {
+                                {[...Array(this.state.rows)].map((_e, i) => {
                                     return( 
-                                        <tr key={i}>
-                                            {Array.from(Array(this.state.columns), (_e, j) => {
+                                        <tr key={`row${i}`}>
+                                            {[...Array(this.state.columns)].map((_e, j) => {
                                                 return(
-                                                    <td key={j} onClick={(e)=> this.changeTerrain(e)} onMouseOver={(e)=> this.checkIfMouseIsPressed(e)} style={{background: this.state.colors[i][j]}} 
+                                                    <td key={`tile${j}${i}`} onClick={(e)=> this.changeTerrain(e)} onMouseOver={(e)=> this.checkIfMouseIsPressed(e)} style={{background: this.state.tileset[i][j].color}} 
                                                         id={"pt"+i.toString()+"/"+j.toString()}>
                                                         <div style={{background: this.state.pathColors[i][j]}}  className="path"></div>
                                                     </td>
@@ -395,7 +237,7 @@ export default class Pathfinder extends React.Component {
                     <div className="agenda-labels">
                         <div className="small-box">
                             <div> <div className="rectangle black"></div> - Impassable tile</div>
-                            <div> <div className="rectangle brown"></div> - Mountain = 1.5 cost of normal tile</div>
+                            <div> <div className="rectangle brown"></div> - Mountain = 3 cost of normal tile</div>
                             <div> <div className="rectangle orange"></div> - Tiles to find a path</div>
                             <div> <div className="rectangle green"></div> - Tiles visited by algorithm at least once</div>
                             <div> <div className="rectangle purple"></div> - shortest path between points</div>
