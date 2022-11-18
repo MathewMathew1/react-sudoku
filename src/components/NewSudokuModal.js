@@ -1,8 +1,7 @@
 import ReactModal from 'react-modal';
 import React from 'react';
-import { containsObject} from './functions';
+import { containsObject} from './helpers/helpers';
 import isSafe from './sudokuFunctions/isSafe';
-import findEmptyLocation from './sudokuFunctions/findEmptyLocation';
 
 export default class NewSudokuModal extends React.Component {
     
@@ -10,11 +9,10 @@ export default class NewSudokuModal extends React.Component {
         super(props);
         this.state = {
 
-            newSudoku: [[0, 0, 0, 0, 9, 0, 0, 0, 0], [0, 1, 8, 7, 0, 0, 0, 0, 0], [4, 0, 0, 8, 0, 0, 0, 0, 1],
-            [0, 6, 0, 0, 0, 8, 0, 0, 0], [1, 0, 0, 4, 0, 0, 3, 0, 0], [0, 7, 0, 0, 0, 0, 8, 2, 9],
-            [0, 2, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 9, 0, 4, 2, 7, 0], [6, 0, 0, 0, 5, 0, 1, 0, 0]],
+            newSudoku: [["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
+            ["","", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""]],
             errorsNewSudoku: [],
-            uniqueSolution: 0,
             beingSolved: false
         };
     }
@@ -38,63 +36,46 @@ export default class NewSudokuModal extends React.Component {
 
     }
 
-    async convertSudokuAndCheckIfSolvable(newSudoku=[...this.state.newSudoku]){
+    async convertSudokuAndCheckIfSolvable(){
         this.setState({beingSolved:true})
+        
+
         let copySudoku = []
-        for (let i = 0; i < newSudoku.length; i++){
-            copySudoku[i] = newSudoku[i].slice();
+        for (let i = 0; i < this.state.newSudoku.length; i++){
+            copySudoku[i] = this.state.newSudoku[i].slice();
         }
         for(let i=0; i< copySudoku.length; i++){
             for(let j=0; j< copySudoku[i].length; j++){
                 if(copySudoku[i][j]===""){
                     copySudoku[i][j] = 0
+                    continue
                 }
+                copySudoku[i][j] = parseInt(copySudoku[i][j])
             }
         }
-        await this.setState({uniqueSolution: 0})
-        this.setState({errorsNewSudoku: []})
-  
-        await this.checkIfOnlyOneSolution(copySudoku)
-            this.props.changeSudoku(this.state.newSudoku)
-        if(this.state.uniqueSolution>1){
-            this.setState({errorsNewSudoku: ["Sudoku not solvable(more than possibility)"]})
-        }
-        else if(this.state.uniqueSolution===0){
+        
+        let numberOfSolutions = await this.props.checkIfSolvable(copySudoku)
+        console.log(numberOfSolutions)
+       
+        this.setState({beingSolved: false})
+        if(numberOfSolutions>1){
+            this.setState({errorsNewSudoku: ["Sudoku not solvable(more than one possibility)"]})
+            return
+        }        
+        
+        if(numberOfSolutions===0){
+            
             this.setState({errorsNewSudoku: ["Sudoku not solvable(zero ways of solving)"]})
-        }
-        else{
-            this.setState({numbersSudoku: copySudoku})
-            this.props.closeModal()
-            this.setState({newSudoku: [["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
-            ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
-            ["","", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""]]})
-        }
-
-    }
-
-    async checkIfOnlyOneSolution(sudoku){
-        if(this.state.uniqueSolution>1 || this.props.modalIsOpen === false){
             return
         }
-        let tile = [0, 0]
         
-        if(!findEmptyLocation(sudoku, tile)){
-           
-            this.setState({uniqueSolution: this.state.uniqueSolution + 1})
-            return true
-        } 
-   
-        let row = tile[0]
-        let col = tile[1]
-        for (let i = 1;  i < 10; i++) {
-            
-            if(isSafe(sudoku, row, col, i)){
-                sudoku[row][col] = i
-                await this.checkIfOnlyOneSolution(sudoku)
-                sudoku[row][col] = 0
-            }
-        }       
-    return false
+        this.props.changeSudoku(copySudoku)
+        this.props.closeModal()
+        this.setState({newSudoku: [["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
+        ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
+        ["","", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""]]})
+
+
     }
 
     sleep = (ms) => {
@@ -150,77 +131,79 @@ export default class NewSudokuModal extends React.Component {
     }
 
     render() { 
-        return <div>
-            <ReactModal
-                isOpen={this.props.modalIsOpen}
-                contentLabel={"Create Sudoku"}
-                onRequestClose={this.props.closeModal}
-                id={"some-id"}
-                onAfterOpen={this.focus}
-                ariaHideApp={false}
+        return (
+            <div>
+                <ReactModal
+                    isOpen={this.props.modalIsOpen}
+                    contentLabel={"Create Sudoku"}
+                    onRequestClose={this.props.closeModal}
+                    id={"some-id"}
+                    onAfterOpen={this.focus}
+                    ariaHideApp={false}
 
-                shouldFocusAfterRender={true}
-                shouldCloseOnOverlayClick={true}
-                shouldCloseOnEsc={true}
-                shouldReturnFocusAfterClose={true}
-                style={{
-                    overlay: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                    textAlign: "center", 
-                    },
-                    content: {
-                        position: 'relative',
-                        display: "inline-block",
-                        border: '1px solid #ccc',
-                        background: '#fff',
-                        WebkitOverflowScrolling: 'touch',
-                        borderRadius: '4px',
-                        inset: '0',
-                        outline: 'none',
-                        padding: '20px'
-                    }
-                }}>
-                <table  className="sudokuTable">
-                    <caption>Create your own Sudoku</caption>
-                    <colgroup><col/><col/><col/></colgroup>
-                    <colgroup><col/><col/><col/></colgroup>
-                    <colgroup><col/><col/><col/></colgroup>
-                    <tbody>
-                    {this.state.newSudoku.map((value, index) => {
-                            return( 
-                                <tr key={index}>
-                                    {this.state.newSudoku[index].map((value, index2) => {
-                                        return(
-                                            <td key={index2} >
-                                                <input onKeyDown={(event)=> this.moveFocus(event)} 
-                                                    id={"Nsd"+index.toString()+index2.toString()} className="sudoku-td-input" value={value} 
-                                                    onChange={(e) => this.changeNumberInNewSudoku(e, index, index2)}  >
-                                                </input>
-                                            </td>
-                                        )
-                                    })}
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-                    <div className="right">
-                        <button className="button close" onClick={()=> this.props.closeModal()} >
-                            Close
-                        </button>
-                        <button disabled={this.state.beingSolved} className="button solve" 
-                            onClick={()=> this.convertSudokuAndCheckIfSolvable(this.state.newSudoku)} >
-                                Save
-                        </button>
-                    </div>
-                        {this.state.errorsNewSudoku.map((value3, index3) => {
-                            return(
-                                <div key={index3} className="error">{value3}</div>
-                            )
-                        })}
-            </ReactModal>
-
-        </div>;
+                    shouldFocusAfterRender={true}
+                    shouldCloseOnOverlayClick={true}
+                    shouldCloseOnEsc={true}
+                    shouldReturnFocusAfterClose={true}
+                    style={{
+                        overlay: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                        textAlign: "center", 
+                        },
+                        content: {
+                            position: 'relative',
+                            display: "inline-block",
+                            border: '1px solid #ccc',
+                            background: '#fff',
+                            WebkitOverflowScrolling: 'touch',
+                            borderRadius: '4px',
+                            inset: '0',
+                            outline: 'none',
+                            padding: '20px',
+                            overflow: "none"
+                        }
+                    }}>
+                    <table  className="sudokuTable">
+                        <caption>Create your own Sudoku</caption>
+                        <colgroup><col/><col/><col/></colgroup>
+                        <colgroup><col/><col/><col/></colgroup>
+                        <colgroup><col/><col/><col/></colgroup>
+                        <tbody>
+                        {this.state.newSudoku.map((value, index) => {
+                                return( 
+                                    <tr key={index}>
+                                        {this.state.newSudoku[index].map((value, index2) => {
+                                            return(
+                                                <td key={index2} >
+                                                    <input onKeyDown={(event)=> this.moveFocus(event)} 
+                                                        id={"Nsd"+index.toString()+index2.toString()} className="sudoku-td-input" value={value} 
+                                                        onChange={(e) => this.changeNumberInNewSudoku(e, index, index2)}  >
+                                                    </input>
+                                                </td>
+                                            )
+                                        })}
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                        <div className="right">
+                            <button className="button close" onClick={()=> this.props.closeModal()} >
+                                Close
+                            </button>
+                            <button disabled={this.state.beingSolved} className="button solve" 
+                                onClick={()=> this.convertSudokuAndCheckIfSolvable(this.state.newSudoku)} >
+                                    Save
+                            </button>
+                        </div>
+                            {this.state.errorsNewSudoku.map((value3, index3) => {
+                                return(
+                                    <div key={index3} className="error">{value3}</div>
+                                )
+                            })}
+                </ReactModal>
+            </div>
+        )
     }
 }
  
