@@ -32,24 +32,25 @@ function App() {
           <div className="hamburger"></div>
         </div>
       </div>
-          <Switch>
-            <Route path="/Home">
-                <Home/>
-            </Route>
-          </Switch>
+          
           <Switch>
             <Route path="/sudoku">
                 <Sudoku/>
             </Route>
-          </Switch>
-          <Switch>
+
+      
             <Route path="/pathfinder">
                 <Pathfinder/>
             </Route>
-          </Switch>
-          <Switch>
+     
+      
             <Route path="/knight-tour">
                 <KnightTour/>
+            </Route>
+          
+        
+            <Route path="*" >
+                <Home/>
             </Route>
           </Switch>
         
