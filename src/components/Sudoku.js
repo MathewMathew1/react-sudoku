@@ -5,8 +5,8 @@ import SudokuA from './Sudoku/SudokuA';
 import { sleep} from './helpers/helpers';
 import WorkerBuilder from "./workerbuilder.js";
 import worker from "./worker.js";
-
-
+import workerHumanSudokuCreator from './workerHumanSudokuCreator';
+import workerFullSudoku from './workerFullSudoku';
 
 const MAX_SPEED_NUMBER = 4
 
@@ -21,8 +21,13 @@ const METHODS_OF_SOLVING = [
     {name: "Backtracking", methodNumber: 1}
 ]
 
+const DIFFICULTIES = ["Easy", "Medium", "Hard"]
+
 let sudoku
-const instance = new WorkerBuilder(worker); 
+const bruteForceCreatorInstance = new WorkerBuilder(worker); 
+const humanCreatorInstance = new WorkerBuilder(workerHumanSudokuCreator); 
+const fullSudokuCreator = new WorkerBuilder(workerFullSudoku); 
+
 export default class Sudoku extends React.Component {
     constructor(props){
         super(props);
@@ -40,6 +45,7 @@ export default class Sudoku extends React.Component {
             colors: [],
             modalIsOpen: false,
             solutionToSudoku: [],
+            difficulty: DIFFICULTIES[0]
         };
 
         this.updateCaptions = this.updateCaptions.bind(this)
@@ -48,7 +54,7 @@ export default class Sudoku extends React.Component {
         this.prepareSleep = this.prepareSleep.bind(this)
         this.changePotentials = this.changePotentials.bind(this)
         this.changeNumbers = this.changeNumbers.bind(this)
-   
+        
         for (let i = 0; i < this.state.potentialNumbers.length; i++) {
             this.state.potentialNumbers[i] = [];
             for (let a = 0; a < this.state.potentialNumbers.length; a++)
@@ -65,7 +71,8 @@ export default class Sudoku extends React.Component {
     componentDidMount(){
         sudoku = new SudokuA(SUDOKUS[0], this.updateCaptions, this.changeNumber, 
             this.changeColor, this.prepareSleep, this.changePotentials, this.changeNumbers)
-        instance.onmessage = (e) => {
+        bruteForceCreatorInstance.onmessage = (e) => {
+            console.log({a: e.data})
             this.setState({numbersSudoku: e.data})
             this.setState({creationMode: false})
             this.setState({caption: "Sudoku Created"})
@@ -74,6 +81,26 @@ export default class Sudoku extends React.Component {
             this.cleanColors()
         }    
 
+        fullSudokuCreator.onmessage = (e) => {
+            if(this.state.methodNumber === 0){
+                humanCreatorInstance.postMessage({sudoku: e.data, difficulty: this.state.difficulty})
+            }else{
+                bruteForceCreatorInstance.postMessage({sudoku: e.data, difficulty: this.state.difficulty})
+            }
+            
+            //instance.postMessage("create sudoku")
+        }
+
+        humanCreatorInstance.onmessage = (e) => {
+            console.log({a: e.data})
+            this.setState({numbersSudoku: e.data})
+            this.setState({creationMode: false})
+            this.setState({caption: "Sudoku Created"})
+            this.setState({captionColor: "pink"})
+            this.setState({buttonDisable: false})
+            this.cleanColors()
+        }
+        
         document.title = "Sudoku"
     }
 
@@ -219,9 +246,10 @@ export default class Sudoku extends React.Component {
         this.setState({creationMode: true})
         
         await sleep(50)
-                   
-        instance.postMessage("create sudoku")
-       // await sudoku.createNewSudoku()
+        fullSudokuCreator.postMessage("") 
+                  
+        
+
         return
     }
 
@@ -273,21 +301,34 @@ render() {
                     <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
                 </div>
                     <div className="label-area">
-                        <div >
-                            Speed of solving :   {this.state.speed}
+                        <div className='option-area'>
+                            <label>Speed of solving :   {this.state.speed}</label>
                             <input type="range" min="0" max={MAX_SPEED_NUMBER} value={this.state.speed} 
                                 onChange={ (e) => this.setState({ speed: parseInt(e.target.value) })}  id="myRange"></input>
                         </div>
-                        <div >
-                            Method of solving :  &nbsp;
-                            <label className="switch"  >
-                                <input onClick={()=>this.changeMethodOfSolving()} type="checkbox"/>
-                                <span className="slider" ><span className="toggle_text">{this.state.wayOfSolving.name}</span></span>
-                            </label>
+                        <div className='option-area' >
+                            <label htmlFor="difficultySelect">Method of Solving:</label>
+                            <select id="difficultySelect" value={this.state.methodNumber} onChange={(e)=>this.setState({methodNumber: e.target.value})}>
+                                {METHODS_OF_SOLVING.map((method, index) => (
+                                <option key={index} value={method.methodNumber}>
+                                    {method.name}
+                                </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className='option-area' style={{paddingTop: "0.4rem"}}>
+                            <label htmlFor="methodSelect">Select Difficulty:</label>
+                            <select id="methodSelect" value={this.state.difficulty} onChange={(e)=>this.setState({difficulty: e.target.value})}>
+                                {DIFFICULTIES.map((difficulty, index) => (
+                                <option key={index} value={difficulty}>
+                                    {difficulty}
+                                </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="explaining-labels">
-                        <div className="small-box">
+                        <div className="small-box glass">
                             <div> <div className="rectangle black"></div> - Base numbers</div>
                             <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
                             <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>

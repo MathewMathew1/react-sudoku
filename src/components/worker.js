@@ -1,8 +1,15 @@
 //fibo.worker.js
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
+    
+    const numbersBasedOnDifficulty = {
+        "Easy": {min: 34, max: 38},
+        "Medium": {min: 28, max: 33},
+        "Hard": {min: 0, max: 31}
+    }
+
     // eslint-disable-next-line no-restricted-globals
-    self.onmessage = function(message){
+    self.onmessage = function(e){
         let numberListArranged = []
         let numberOfSolving = 0
         let solved = false
@@ -55,31 +62,7 @@ export default () => {
             max = Math.floor(max);
             return Math.floor(Math.random() * (max - min)) + min;
           }
-         
-
-        const bruteForceSudoku = (sudoku) =>{
-            
-            let tile = [0, 0]
-            if(!findEmptyLocation(sudoku, tile)){
-                return true
-            }    
         
-            let row = tile[0]
-            let col = tile[1]
-            let l = numberListArranged.length
-            
-            for (let i = 0;  i < l; i++) {
-                if(isSafe(sudoku, row, col, numberListArranged[i])){
-                    sudoku[row][col] = numberListArranged[i]
-                    if(bruteForceSudoku(sudoku)!==false){
-                        numberOfSolving =+ 1
-                        return true
-                    }
-                    sudoku[row][col] = 0
-                }
-            }     
-            return false
-        }
 
         const checkIfSolvable = (sudoku) =>{
             if(numberOfSolving>1) return
@@ -116,27 +99,17 @@ export default () => {
             
             numberListArranged = numberListArrangedCopy
         }
+
+        
         
         const createNewSudoku = () =>{    
             
             arrangeNumber()    
-            let newCreatedSudoku = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-            
-            for (let i = 1; i < 10; i++){
-                
-                while(true){
-                    let X_Place=getRandomNumber(0,9)
-                    let Y_Place=getRandomNumber(0,9)
-                    if(newCreatedSudoku[X_Place][Y_Place]===0){
-                        newCreatedSudoku[X_Place][Y_Place] = i
-                        break
-                    }    
-                }
+            let newCreatedSudoku = [];
+            for (let i = 0; i < e.data.sudoku.length; i++){
+                newCreatedSudoku[i] = e.data.sudoku[i].slice();
             }
-            
-            bruteForceSudoku(newCreatedSudoku)
+        
             let removeValueFromArrayNumbers = []
             let X_to_removeValueFromArray = 0
             let Y_to_removeValueFromArray = 0
@@ -146,6 +119,9 @@ export default () => {
             
             
             while(a<100){
+                if(known < numbersBasedOnDifficulty[e.data.difficulty].min){
+                    break
+                }
 
                 a += 1
                 while(true){
@@ -172,7 +148,7 @@ export default () => {
                 checkIfSolvable(copyArray)
                 if(numberOfSolving===1) continue
 
-                if(known<31){ 
+                if( known<numbersBasedOnDifficulty[e.data.difficulty].max){ 
                     newCreatedSudoku[X_to_removeValueFromArray][Y_to_removeValueFromArray] = removeValueFromArrayNumbers[removeValueFromArrayNumbers.length-1].number
                     solved = true
                     break

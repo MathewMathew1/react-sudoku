@@ -1,6 +1,35 @@
+html{
+  background: linear-gradient(#e66465, #9198e5);
+  background-repeat: repeat;
+  min-height: 100%;
+}
+
 .topNav {
   overflow: hidden;
   background-color: #333;
+}
+
+.option-area {
+  display: flex;
+  align-items: center;
+  padding: .5em;
+
+}
+
+.glass{
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.option-area > label {
+  width: 10rem;
+}
+.option-area > input, .option-area > select {
+  flex: 1;
 }
 
 .topNav a, .topNav-a {
@@ -256,17 +285,13 @@ table.sudokuTable  td {
   text-align: center; 
   padding: 0; 
   background-color: white; 
-  box-shadow: 30px 30px 0px #999; 
   border-color: black;
 }
 
 
 
-sudokuTable> tbody, colgroup{ border-left:  solid medium;
+.sudokuTable> tbody, colgroup{ border-left:  solid medium;
   border-color: black; }
-
-
-
 
 .sudokuTable :nth-child(3n+1)  td{ border-top:  solid medium;
   border-color: black;
@@ -536,9 +561,18 @@ select {
     margin: 1%;
     padding: 0;
     width: 95%;
-    max-width: 450px;
-    
+    max-width: 450px; 
   }
+
+  .option-area{
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .option-area > select, .option-area > input{
+    width: 100%;
+  }
+  
 
   .sudoku-grid{
     grid-template-areas:
@@ -568,6 +602,7 @@ select {
     padding: 0;
     padding-top: 1rem;
     align-items: center;
+  
   }
   
   table.sudokuTable{

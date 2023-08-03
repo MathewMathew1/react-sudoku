@@ -244,7 +244,7 @@ export default class SudokuA {
                     }
                     
                     if(temp_d[0] === 1){
-                        if(temp_d[1]!==[temp_d[2]]){   //Since We are checking both rows and columns, in situation when x and y are the same we set number two times
+                        if(temp_d[1]!==temp_d[2]){   //Since We are checking both rows and columns, in situation when x and y are the same we set number two times
                             this.numbers[temp_d[1]][temp_d[2]] = a
                             if(this.creationMode === false){
                                 this.updateNumber(temp_d[1], temp_d[2], a)
