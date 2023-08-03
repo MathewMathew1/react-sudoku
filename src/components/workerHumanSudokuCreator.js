@@ -38,7 +38,7 @@ export default () => {
 
         class SudokuCreator {
             constructor() {
-                console.log(e.data.difficulty)
+
                 this.newSudoku = e.data.sudoku;
                 this.difficulty = e.data.difficulty
                 this.numberListArranged = []
@@ -68,7 +68,7 @@ export default () => {
                 let known = 81
                 let a = 0
                 let lastSudokuFulfilsHardRequirement = false
-                console.log(numbersBasedOnDifficulty[this.difficulty].max)
+
                 while(a<10000){
                     if(known < numbersBasedOnDifficulty[this.difficulty].min){
                         break

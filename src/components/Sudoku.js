@@ -41,7 +41,7 @@ export default class Sudoku extends React.Component {
             captionColor: "blue",
             sleepTime: 0,
             creationMode: false,
-            wayOfSolving: METHODS_OF_SOLVING[0],
+            methodNumber: METHODS_OF_SOLVING[0].methodNumber,
             colors: [],
             modalIsOpen: false,
             solutionToSudoku: [],
@@ -72,7 +72,7 @@ export default class Sudoku extends React.Component {
         sudoku = new SudokuA(SUDOKUS[0], this.updateCaptions, this.changeNumber, 
             this.changeColor, this.prepareSleep, this.changePotentials, this.changeNumbers)
         bruteForceCreatorInstance.onmessage = (e) => {
-            console.log({a: e.data})
+
             this.setState({numbersSudoku: e.data})
             this.setState({creationMode: false})
             this.setState({caption: "Sudoku Created"})
@@ -92,7 +92,7 @@ export default class Sudoku extends React.Component {
         }
 
         humanCreatorInstance.onmessage = (e) => {
-            console.log({a: e.data})
+
             this.setState({numbersSudoku: e.data})
             this.setState({creationMode: false})
             this.setState({caption: "Sudoku Created"})
@@ -118,10 +118,10 @@ export default class Sudoku extends React.Component {
     }
 
     changeMethodOfSolving = () => {
-        if(this.state.wayOfSolving.methodNumber === 1){
-            this.setState({wayOfSolving: METHODS_OF_SOLVING[0]})
+        if(this.state.methodNumber === 1){
+            this.setState({methodNumber: METHODS_OF_SOLVING[0].methodNumber})
         }
-        else this.setState({wayOfSolving: METHODS_OF_SOLVING[1]})
+        else this.setState({methodNumber: METHODS_OF_SOLVING[1].methodNumber})
     }
     
     async cleanSudoku(){
@@ -201,18 +201,20 @@ export default class Sudoku extends React.Component {
         }
         this.setState({sleepTime: 0})
         this.setState({creationMode: false})
-        if(this.state.wayOfSolving.methodNumber===1){
+
+        if(this.state.methodNumber===1){
             this.setState({captionColor: "red"})
-            this.setState({caption: this.state.wayOfSolving.name})
+            this.setState({caption: "Backtracking"})
             await this.changeColorsOfAll()
             await sleep(25)
-            let resultSudokuNumbers = await sudoku.solveSudoku(this.state.wayOfSolving.methodNumber)
-            
+            let resultSudokuNumbers = await sudoku.solveSudoku(this.state.methodNumber)
+
             this.updateCaptions("Finished", "pink")
+
             this.setState({numbersSudoku: resultSudokuNumbers})
         }    
         else{
-            await sudoku.solveSudoku(0)
+            await sudoku.solveSudoku(this.state.methodNumber)
         }
         
         this.setState({buttonDisable: false})
@@ -270,9 +272,22 @@ render() {
                                 return( 
                                     <tr key={index}>
                                         {this.state.numbersSudoku[index].map((value, index2) => {
+                                            const color = this.state.colors[index][index2]
+                                            const showWave = color === "blue" || color === "green"
+
                                             if(this.state.numbersSudoku[index][index2]!==0) 
                                                 return(
-                                                <td key={index2} id={"sd"+index.toString()+index2.toString()} style={{color: this.state.colors[index][index2]}}>{value}</td>
+                                                <td key={index2} id={"sd"+index.toString()+index2.toString()} style={{color: color, position: "relative"}}>
+                                                    {value}
+                                                    {showWave?
+                                                        <span className='wave'>
+                                                        
+                                                        </span>
+                                                    :
+                                                        null
+                                                    }
+                                                    
+                                                </td>
                                                 )
                                             else if(this.state.potentialNumbers[index][index2].length===0) {
                                                 return (
@@ -300,7 +315,7 @@ render() {
                     <button disabled={this.state.buttonDisable} onClick={()=> this.newSudoku()} className="button create">New</button>
                     <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
                 </div>
-                    <div className="label-area">
+                    <div className="label-area glass">
                         <div className='option-area'>
                             <label>Speed of solving :   {this.state.speed}</label>
                             <input type="range" min="0" max={MAX_SPEED_NUMBER} value={this.state.speed} 
@@ -308,7 +323,7 @@ render() {
                         </div>
                         <div className='option-area' >
                             <label htmlFor="difficultySelect">Method of Solving:</label>
-                            <select id="difficultySelect" value={this.state.methodNumber} onChange={(e)=>this.setState({methodNumber: e.target.value})}>
+                            <select id="difficultySelect" value={this.state.methodNumber} onChange={(e)=>{this.setState({methodNumber: parseInt(e.target.value)})}}>
                                 {METHODS_OF_SOLVING.map((method, index) => (
                                 <option key={index} value={method.methodNumber}>
                                     {method.name}

@@ -114,13 +114,16 @@ export default class SudokuA {
     }
 
     async solveSudoku(method){
+        console.log({method})
         this.baseInfo()
         if(method===0){
             await this.cleanPossibilities()
             await this.getPossibilities()
         }
         else{
+         
            await this.bruteForceSudoku([...this.numbers])
+           console.log(this.numbers)
            return this.numbers
         }
     }
