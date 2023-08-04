@@ -53,7 +53,7 @@ export default () => {
             }
         }
 
-        async createSudoku (){
+        async createSudoku(){
             let newCreatedSudoku = [];
             for (let i = 0; i < this.newSudoku.length; i++){
                 newCreatedSudoku[i] = this.newSudoku[i].slice();
