@@ -1,7 +1,7 @@
 import { sleep } from "../helpers/helpers"
 
 export default class PathfinderA {
-    constructor(rows, columns, points, updateVisuals, updateErrors, tileset, finishSolving) {
+    constructor(rows, columns, points, updateVisuals, updateErrors, tileset, finishSolving, cleanLeftovers) {
         this.gScore = []
         this.fScore =  []
         this.rows = rows
@@ -16,6 +16,7 @@ export default class PathfinderA {
         this.updateErrors = updateErrors
         this.path = []
         this.foundPath = []
+        this.cleanLeftovers = cleanLeftovers
         for(let i=0; i<rows; i++){
             this.gScore.push([])
             this.fScore.push([])
@@ -26,18 +27,13 @@ export default class PathfinderA {
                 this.path[i].push({x: 0, y: 0})
             }
         }
-
-
     }
 
 
     async solveMaze(){
-        
-        if(this.points.length<2){
-            this.updateErrors(["At least two points needed"])
-            return
-        }
+
         for(let i=0; i<this.points.length-1;i++){
+            this.cleanLeftovers()
             this.currentStartingPoint = this.points[this.cycle]
             this.currentEndingPoint = this.points[this.cycle+1]
             await this.findPath()
@@ -52,7 +48,7 @@ export default class PathfinderA {
     async reconstructPath(x, y){
         
         this.updateVisuals(x, y, "purple")
-
+        await sleep(200)
         if(x !== this.currentStartingPoint.x || y !== this.currentStartingPoint.y){
             await this.reconstructPath(this.path[x][y].x, this.path[x][y].y)
         }    

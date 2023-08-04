@@ -18,12 +18,16 @@ html{
 
 .glass{
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 0.6rem;
+}
+
+.glass-rounded{
+  border-radius: 16px;
 }
 
 .option-area > label {
@@ -121,7 +125,9 @@ html{
 }
 
 .button-area{
-  flex-basis: 100%
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .explaining-labels, .label-rules,.agenda-labels, .button-area {
@@ -167,7 +173,8 @@ html{
 
 
 .table-labyrinth-container{
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: none;
 }
 
 .sudokuTable { 
@@ -179,7 +186,7 @@ html{
 }
 
 .labyrinth{
-  margin-top: 2rem;
+  margin-top: 1rem;
   border-collapse: collapse;
   position: relative;
   table-layout: fixed; /* Use fixed table layout */
@@ -202,11 +209,18 @@ html{
   flex-wrap: wrap;
   width: 100%;
 
-  gap: 2rem;
+  gap: 1rem;
   justify-content: center;
 }
 
+.options-buttons-area{
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
 table.labyrinth  td {
+  z-index: 10;
   position: relative;
   height: 1.6rem; 
   width: 1.6rem; 
@@ -215,7 +229,7 @@ table.labyrinth  td {
   background-color: white;
   padding: 0;
   text-align: center;
-
+  overflow: hidden;
   -webkit-user-select: none; /* Safari */        
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
@@ -314,10 +328,16 @@ table.sudokuTable  td {
   height: 100%;
   background-color: blue;
   left: 0;
+  overflow: hidden;
   top: 0;
   opacity: 0.7;
   border-radius: 50%;
   animation: waveAnimation 2s ease-out forwards;
+  pointer-events:none;
+}
+
+.wave-green{
+  background-color: rgb(120, 226, 120);
 }
 
 @keyframes waveAnimation {
@@ -559,14 +579,19 @@ select {
 }
 
 .path{
-  
   margin: auto;
   position: absolute;
   top: 0;
   left: 30%;
   justify-content: center;
-  width: 40%;
+  width: 50%;
   height: 100%;
+  pointer-events:none;
+}
+
+.pathFull{
+  left: 0;
+  width: 100%;
   pointer-events:none;
 }
 
@@ -680,6 +705,14 @@ select {
   .topNav.responsive {
     position: relative
   ;}
+
+  .options-buttons-area{
+    flex-direction: column;
+  }
+
+  .options-buttons-area > * {
+    width: 100%;
+  }
   
   .topNav.responsive a, .topNav.responsive .topNav-a  {
     float: none;

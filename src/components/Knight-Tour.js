@@ -298,7 +298,7 @@ export default class KnightTour extends React.Component {
                     </div>    
                     <div className="labels">
                         <div className="right">
-                            <div className="very-small-box glass">
+                            <div className="very-small-box glass ">
                                 Best Score: Loss {this.state.bestScore}
                             </div>
                             <div className="very-small-box glass">
@@ -309,7 +309,7 @@ export default class KnightTour extends React.Component {
                         </div>
                     </div>
                     <div className="label-rules">
-                        <div className="small-box glass">
+                        <div className="small-box glass glass-rounded">
                             <h3>Rules of Game: </h3>
                             Place knight on tile and press start.Ai will move knight to different tile, then it is your turn. You/Ai cannot move knight to tile that was already visited. Red boxes on tiles symbolize, that this tile was already visited. First player that cannot find a move loses.
                         </div> 

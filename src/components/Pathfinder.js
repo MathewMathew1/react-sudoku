@@ -28,6 +28,7 @@ export default class Pathfinder extends React.Component {
         this.updatePathColor = this.updatePathColor.bind(this)
         this.updateErrors = this.updateErrors.bind(this)
         this.finishSolving = this.finishSolving.bind(this)
+        this.cleanGreen = this.cleanGreen.bind(this)
         
         for(let i=0; i<this.state.rows; i++){
             this.state.tileset.push([])
@@ -94,11 +95,18 @@ export default class Pathfinder extends React.Component {
             return
         } 
 
-        
-        
         if(this.state.whatToPlace.color==="orange"){
-            var content = document.createTextNode(`${this.state.points.length + 1}`);
-            e.target.appendChild(content) 
+            let content = document.createTextNode(`${this.state.points.length + 1}`);
+
+            let appendTo = e.target
+            e.target.childNodes.forEach((node)=> {
+                console.log(node.className)
+                if(node.classList.contains('path')){
+                    appendTo = node
+                }
+            })
+            console.log(e.target.childNodes)
+            appendTo.appendChild(content) 
             this.setState({points: [...this.state.points, {x: x, y: y, content: content}]})
         }
 
@@ -155,15 +163,33 @@ export default class Pathfinder extends React.Component {
     }
 
     async findPath(){
+        if(this.state.points.length<2){
+            this.updateErrors(["At least two points needed"])
+            return
+        }
         this.cleanPath()
         this.setState({buttonDisable: true})
         this.setState({canAdd: false})
-        let Pathfinder = new PathfinderA(this.state.rows, this.state.columns, this.state.points, this.updatePathColor, this.updateErrors, this.state.tileset, this.finishSolving)
+        let Pathfinder = new PathfinderA(this.state.rows, this.state.columns, this.state.points, 
+            this.updatePathColor, this.updateErrors, this.state.tileset, this.finishSolving, this.cleanGreen)
         Pathfinder.solveMaze()
     }
     
     async updateErrors(errorMessage){
         this.setState({errors: [errorMessage]})
+    }
+
+    async cleanGreen(){
+        this.setState((state)=>{
+            let {pathColors} = state
+
+            pathColors.forEach((color, index)=>{
+                pathColors[index].forEach((color2, index2)=>{
+                     if(pathColors[index][index2]==="green") pathColors[index][index2] = "none"
+                })
+            })
+            return {pathColors}
+        })
     }
 
     async updatePathColor(x,y,color){
@@ -195,22 +221,35 @@ export default class Pathfinder extends React.Component {
             <div className="box">
                 <div className="pathfinder-container">
                     <div className="button-area">
-                        <div className="custom-select">   
-                            <select  onChange={(e) => this.handleChange(e)}>
-           
-                                {TILES.map((value, index) => {
-                                     return( 
-                                        <option  key={`tiles ${index}`} value={index}>{value.name}</option>        
-                                    )})}
-                            </select>
+                        <div className="options-buttons-area">
+                           
+                                <div className="custom-select">   
+                                    <select  onChange={(e) => this.handleChange(e)}>
+                
+                                        {TILES.map((value, index) => {
+                                            return( 
+                                                <option  key={`tiles ${index}`} value={index}>{value.name}</option>        
+                                            )})}
+                                    </select>
+                                </div>
+                            
+                                <button disabled={this.state.buttonDisable} onClick={()=> this.findPath()} className="button solve">Solve</button>
+                                <button disabled={this.state.buttonDisable} onClick={()=> this.cleanTiles()} className="button create">Clean</button>
+                                   
                         </div>
-                        <button disabled={this.state.buttonDisable} onClick={()=> this.findPath()} className="button solve">Solve</button>
-                        <button disabled={this.state.buttonDisable} onClick={()=> this.cleanTiles()} className="button create">Clean</button>
-                        {this.state.errors.map((value) => {
-                        return(
-                            <div className="error">{value}</div>
-                        )
-                        })}
+                        <div>
+                            {this.state.errors.length>0?
+                                <div className="glass">
+                                    {this.state.errors.map((value, index) => {
+                                    return(
+                                        <div className="" key={`error ${index}`}>{value}</div>
+                                    )
+                                    })}
+                                </div>
+                            :
+                                <></>
+                            }
+                        </div>
                     </div>
            
                     <div className="table-labyrinth-container">
@@ -220,10 +259,32 @@ export default class Pathfinder extends React.Component {
                                     return( 
                                         <tr key={`row${i}`}>
                                             {[...Array(this.state.columns)].map((_e, j) => {
+                                                const color = this.state.tileset[i][j].color
+                                                const tileIsEmpty = color === "white"
+                                                let additionalClasses = tileIsEmpty? `pathFull`: `` 
+                                              
+                                                
                                                 return(
-                                                    <td key={`tile${j}${i}`} onClick={(e)=> this.changeTerrain(e)} onMouseOver={(e)=> this.checkIfMouseIsPressed(e)} style={{background: this.state.tileset[i][j].color}} 
+                                                    <td 
+                                                        key={`tile${j}${i}`} 
+                                                        onClick={(e)=> this.changeTerrain(e)} 
+                                                        onMouseOver={(e)=> this.checkIfMouseIsPressed(e)} 
+                                                        style={{background: this.state.tileset[i][j].color}} 
                                                         id={"pt"+i.toString()+"/"+j.toString()}>
-                                                        <div style={{background: this.state.pathColors[i][j]}}  className="path"></div>
+                                                        <div style={{background: this.state.pathColors[i][j]}}  className={`path ${additionalClasses}`}>
+                                                           
+                                                        </div>
+                                                        {this.state.pathColors[i][j] === "green"?
+                                                            <span className='wave wave-green'></span>
+                                                        :
+                                                            <>
+                                                                {this.state.pathColors[i][j] === "purple"?
+                                                                    <span className='wave'></span>
+                                                                :
+                                                                    null
+                                                                }
+                                                            </>
+                                                        }
                                                     </td>
                                                 )})}
                                         </tr>        
@@ -233,12 +294,12 @@ export default class Pathfinder extends React.Component {
                     </div>
                
                     <div className="agenda-labels">
-                        <div className="small-box glass">
+                        <div className="small-box glass glass-rounded">
                             <div> <div className="rectangle black"></div> - Impassable tile</div>
                             <div> <div className="rectangle brown"></div> - Mountain = 3 cost of normal tile</div>
                             <div> <div className="rectangle orange"></div> - Tiles to find a path</div>
                             <div> <div className="rectangle green"></div> - Tiles visited by algorithm at least once</div>
-                            <div> <div className="rectangle purple"></div> - shortest path between points</div>
+                            <div> <div className="rectangle purple"></div> - Shortest path between points</div>
                         </div>   
                     </div>
                 </div>

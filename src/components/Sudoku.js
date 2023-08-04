@@ -315,7 +315,7 @@ render() {
                     <button disabled={this.state.buttonDisable} onClick={()=> this.newSudoku()} className="button create">New</button>
                     <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
                 </div>
-                    <div className="label-area glass">
+                    <div className="label-area glass glass-rounded">
                         <div className='option-area'>
                             <label>Speed of solving :   {this.state.speed}</label>
                             <input type="range" min="0" max={MAX_SPEED_NUMBER} value={this.state.speed} 
@@ -343,7 +343,7 @@ render() {
                         </div>
                     </div>
                     <div className="explaining-labels">
-                        <div className="small-box glass">
+                        <div className="small-box glass glass-rounded">
                             <div> <div className="rectangle black"></div> - Base numbers</div>
                             <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
                             <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>
