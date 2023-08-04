@@ -53,7 +53,7 @@ export default () => {
             }
         }
 
-        async cleanPossibilities(){
+        cleanPossibilities(){
             for(let i=0; i<9; i++){
                 for(let j=0; j<9; j++){
                     this.potentialNumbers[i][j] = []
@@ -132,7 +132,7 @@ export default () => {
         }
 
         async checkIfSolvable(sudoku){
-           await this.cleanPossibilities()
+           this.cleanPossibilities()
            this.baseInfo(sudoku)
            const result = await this.getPossibilities(sudoku)
 
