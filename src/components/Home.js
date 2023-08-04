@@ -48,16 +48,16 @@ class Home extends React.Component {
                 <h1 >
                     About this site:
                 </h1>
-                <div style={{padding:"0.2rem"}}>
-                    This site is created with react and bootstrap. It includes 3 different small projects.
+                <div className="glass" style={{padding:"2rem"}}>
+                    This site contains three small projects. Short description of each project below.
                 </div>
-                <div className="accordion">
+                <div className="accordion glass">
                     {ACCORDION_DATA.map((value, index) => {
                     return( 
-                        <div key={`accordion ${index}`} className="accordion-item">
+                        <div key={`accordion ${index}`} className="accordion-item glass">
                             <div className="accordion-title" onClick={()=>this.showAccordion(index, !this.state.accordionsOpen[index])}>
                                 <div>{value.title}</div>
-                                <div>+</div>
+                                <div>{this.state.accordionsOpen[index] ? "+": "-"}</div>
                             </div>
                             {this.state.accordionsOpen[index] ?
                                     <div className="accordion-content" dangerouslySetInnerHTML={{__html: value.content}}>
