@@ -23,6 +23,7 @@ html{
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.6rem;
 }
 
 .option-area > label {
@@ -119,7 +120,9 @@ html{
   text-align: right
 }
 
-
+.button-area{
+  flex-basis: 100%
+}
 
 .explaining-labels, .label-rules,.agenda-labels, .button-area {
   display: flex;
@@ -160,20 +163,11 @@ html{
   'labelArea labelArea -';
 }
 
-.button-area{grid-area: buttonArea;}
-.labyrinth-div{grid-area: table;}
-.agenda-labels{grid-area: labelArea;}
-
-.path-grid{
-  width: 90%;
-  grid-template-areas:
-  'buttonArea buttonArea buttonArea buttonArea -'
-  'table table table table labelArea';
-}
 
 
-.labyrinth-div{
-  overflow-x:auto
+
+.table-labyrinth-container{
+  overflow: auto;
 }
 
 .sudokuTable { 
@@ -188,7 +182,8 @@ html{
   margin-top: 2rem;
   border-collapse: collapse;
   position: relative;
-
+  table-layout: fixed; /* Use fixed table layout */
+  width: fit-content;
 }
 
 .chessBoard{
@@ -202,16 +197,25 @@ html{
   opacity: 0.5;
 }
 
+.pathfinder-container{
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+
+  gap: 2rem;
+  justify-content: center;
+}
+
 table.labyrinth  td {
   position: relative;
-  height: 2em; 
-  width: 2em; 
+  height: 1.6rem; 
+  width: 1.6rem; 
   border-color: black;
   border: solid medium;
   background-color: white;
   padding: 0;
   text-align: center;
-  font-size: 1.2rem;
+
   -webkit-user-select: none; /* Safari */        
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
@@ -652,6 +656,8 @@ select {
     margin: 0;
    
   }
+
+  
 
   .table.sudokuTable  td{
     box-shadow: 0 0 0 none;

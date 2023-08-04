@@ -193,7 +193,7 @@ export default class Pathfinder extends React.Component {
     render() {
         return (
             <div className="box">
-                <div className="grid-container path-grid">
+                <div className="pathfinder-container">
                     <div className="button-area">
                         <div className="custom-select">   
                             <select  onChange={(e) => this.handleChange(e)}>
@@ -212,8 +212,8 @@ export default class Pathfinder extends React.Component {
                         )
                         })}
                     </div>
-                    
-                    <div className="labyrinth-div">
+           
+                    <div className="table-labyrinth-container">
                         <table className="labyrinth">
                             <tbody>
                                 {[...Array(this.state.rows)].map((_e, i) => {
@@ -231,6 +231,7 @@ export default class Pathfinder extends React.Component {
                             </tbody>
                         </table>
                     </div>
+               
                     <div className="agenda-labels">
                         <div className="small-box glass">
                             <div> <div className="rectangle black"></div> - Impassable tile</div>
