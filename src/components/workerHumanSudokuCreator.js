@@ -478,7 +478,7 @@ export default () => {
             }      
         }
 
-        const sudoku = new SudokuCreator()
+        new SudokuCreator()
         //sudoku.createSudoku()
     }
 }
