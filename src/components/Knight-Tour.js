@@ -184,6 +184,7 @@ export default class KnightTour extends React.Component {
     }
 
     async aiMove(){
+        this.setState({labelDescription: "Ai turn"})
         await sleep(1000)
         if(this.state.gameStarted === false) return
         let rowToMove
@@ -302,14 +303,14 @@ export default class KnightTour extends React.Component {
                                 Best Score: Loss {this.state.bestScore}
                             </div>
                             <div className="very-small-box glass">
-                                turn: {this.state.turn}
+                                Turn: {this.state.turn}
                             </div>
                             <button disabled={this.state.gameStarted} onClick={()=> this.startGame()} className="button solve">Start</button>
                             <button onClick={()=> this.reset()} className="button create">Reset</button>
                         </div>
                     </div>
                     <div className="label-rules">
-                        <div className="small-box glass glass-rounded">
+                        <div className="small-box glass glass-rounded" style={{maxWidth: "500px"}}>
                             <h3>Rules of Game: </h3>
                             Place knight on tile and press start.Ai will move knight to different tile, then it is your turn. You/Ai cannot move knight to tile that was already visited. Red boxes on tiles symbolize, that this tile was already visited. First player that cannot find a move loses.
                         </div> 

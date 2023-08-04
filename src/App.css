@@ -249,8 +249,8 @@ table.labyrinth  td {
 }
 
 table.chessBoard  td{
-  height: 2.5em; 
-  width: 2.5em; 
+  height: 3em; 
+  width: 3em; 
   border-color: black;
   border: solid medium;
   background-color: rgb(95, 163, 40);
