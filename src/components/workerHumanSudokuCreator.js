@@ -56,7 +56,7 @@ export default () => {
             }
         }
 
-        const createSudoku = async() => {
+        const createSudoku = () => {
             let newCreatedSudoku = [];
             for (let i = 0; i < e.data.sudoku.length; i++){
                 newCreatedSudoku[i] = e.data.sudoku[i].slice();
@@ -95,7 +95,7 @@ export default () => {
                     copyArray[i] = newCreatedSudoku[i].slice();
                 }
 
-                let solvable = await checkIfSolvable(copyArray)
+                let solvable =  checkIfSolvable(copyArray)
                 
                 if(solvable.solved) {
                     lastSudokuFulfilsHardRequirement = solvable.hardMode
@@ -126,15 +126,15 @@ export default () => {
             postMessage(newSudoku);
         }
 
-        const checkIfSolvable = async (sudoku) => {
+        const checkIfSolvable =  (sudoku) => {
             cleanPossibilities()
             baseInfo(sudoku)
-            const result = await getPossibilities(sudoku)
+            const result =  getPossibilities(sudoku)
 
             return result
         }
 
-        const updates = async (x, y, number) => {
+        const updates =  (x, y, number) => {
             potentialNumbers[x][y] = []
             known += 1
             for (let i = 0; i < 9; i++) {
@@ -163,7 +163,7 @@ export default () => {
             return
         }
         
-        const getPossibilities = async (sudoku) =>  {
+        const getPossibilities =  (sudoku) =>  {
             let canNumberBeThere;
             
             let squareEdges = [0, 0, 0, 0]
@@ -199,12 +199,12 @@ export default () => {
                 }
             }
 
-            await solo(sudoku)
-            const result = await solving(sudoku)
+             solo(sudoku)
+            const result =  solving(sudoku)
             return result
         }
 
-        const baseInfo = async (sudoku) => {
+        const baseInfo =  (sudoku) => {
             known = 0;
             for (let i = 0; i < 9; i++) {
                 for (let a = 0; a < 9; a++) {
@@ -215,7 +215,7 @@ export default () => {
             }
         }
     
-        const solo =  async(sudoku) => {
+        const solo =  (sudoku) => {
             for (let x = 0; x < 9; x++) {
                 for (let y = 0; y < 9; y++) {
                     if (potentialNumbers[x][y].length === 1){
@@ -227,7 +227,7 @@ export default () => {
             }      
         }
     
-        const solving = async (sudoku) => {
+        const solving =  (sudoku) => {
             let toRepeat = 0
             let hardMode = false
             while (known < 81){
@@ -293,11 +293,11 @@ export default () => {
                     }
                 }
     
-                await solo(sudoku)            
+                 solo(sudoku)            
                 if (baseKnown === known){
                     toRepeat = toRepeat + 1
                     hardMode = true
-                    await hard()
+                     hard()
                 }
                 if( toRepeat === 10){
                     return {solved: false, hardMode}
@@ -307,7 +307,7 @@ export default () => {
             return {solved: true, hardMode}
         }
 
-            const hard = async() => {
+            const hard = () => {
             for (let a = 1; a < 10; a++) {
                 for (let x = 1; x < 4; x++) {
                     for (let y = 1; y < 4; y++) {      
