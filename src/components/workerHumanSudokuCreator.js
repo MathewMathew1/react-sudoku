@@ -38,7 +38,7 @@ export default () => {
 
         class SudokuCreator {
             constructor() {
-
+                console.log(e)
                 this.newSudoku = e.data.sudoku;
                 this.difficulty = e.data.difficulty
                 this.numberListArranged = []
