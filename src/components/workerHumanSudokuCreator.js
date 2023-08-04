@@ -35,7 +35,7 @@ export default () => {
     }
     // eslint-disable-next-line no-restricted-globals
     self.onmessage = function(e){
-
+        console.log({e})
         class SudokuCreator {
             constructor() {
                 console.log(e)
@@ -475,15 +475,11 @@ export default () => {
                     }
                 }
                 return
-            }
-        
-            
+            }      
         }
 
-        
-
-        const sudoku = new SudokuCreator()
-        sudoku.createSudoku()
+        //const sudoku = new SudokuCreator()
+        //sudoku.createSudoku()
     }
 }
   
