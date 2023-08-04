@@ -53,6 +53,14 @@ export default () => {
             }
         }
 
+        async cleanPossibilities(){
+            for(let i=0; i<9; i++){
+                for(let j=0; j<9; j++){
+                    this.potentialNumbers[i][j] = []
+                }
+            }
+        }
+
         async createSudoku(){
             let newCreatedSudoku = [];
             for (let i = 0; i < this.newSudoku.length; i++){
@@ -121,14 +129,6 @@ export default () => {
             }
 
             postMessage(newSudoku);
-        }
-
-        async cleanPossibilities(){
-            for(let i=0; i<9; i++){
-                for(let j=0; j<9; j++){
-                    this.potentialNumbers[i][j] = []
-                }
-            }
         }
 
         async checkIfSolvable(sudoku){
