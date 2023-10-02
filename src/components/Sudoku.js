@@ -7,6 +7,7 @@ import WorkerBuilder from "./workerbuilder.js";
 import worker from "./worker.js";
 import workerHumanSudokuCreator from './workerHumanSudokuCreator';
 import workerFullSudoku from './workerFullSudoku';
+import SudokuUserSolver from './SudokuUserSolver';
 
 const MAX_SPEED_NUMBER = 4
 
@@ -15,6 +16,19 @@ const SUDOKUS = [
     [9, 6, 0, 0, 5, 0, 0, 7, 0], [0, 0, 4, 0, 0, 0, 9, 0, 0], [0, 0, 2, 6, 0, 0, 0, 0, 0],
     [5, 9, 0, 1, 0, 0, 8, 0, 0], [0, 0, 0, 0, 0, 8, 0, 2, 0], [4, 0, 0, 0, 0, 0, 0, 0, 0]]
 ]
+
+const COMPLETED_SUDOKU = [
+    [8, 1, 9, 5, 6, 3, 2, 4, 7],
+    [2, 4, 5, 8, 7, 9, 6, 1, 3],
+    [3, 7, 6, 4, 1, 2, 5, 8, 9],
+    [9, 6, 3, 2, 5, 1, 4, 7, 8],
+    [1, 5, 4, 3, 8, 7, 9, 6, 2],
+    [7, 8, 2, 6, 9, 4, 3, 5, 1],
+    [5, 9, 7, 1, 2, 6, 8, 3, 4],
+    [6, 3, 1, 9, 4, 8, 7, 2, 5],
+    [4, 2, 8, 7, 3, 5, 1, 9, 6]
+]
+
 
 const METHODS_OF_SOLVING = [
     {name: "Human approach", methodNumber: 0},
@@ -33,7 +47,9 @@ export default class Sudoku extends React.Component {
         super(props);
         this.state = {
             aiMode: true,
+            solveItYourself: false,
             numbersSudoku: SUDOKUS[0], 
+            sudokuWithAllNumbers: COMPLETED_SUDOKU,
             potentialNumbers: new Array(9),
             buttonDisable: false,
             speed: 1,
@@ -51,6 +67,7 @@ export default class Sudoku extends React.Component {
         this.updateCaptions = this.updateCaptions.bind(this)
         this.changeColor = this.changeColor.bind(this)
         this.changeNumber = this.changeNumber.bind(this)
+        this.cancelSolvingSudokuByUser = this.cancelSolvingSudokuByUser.bind(this)
         this.prepareSleep = this.prepareSleep.bind(this)
         this.changePotentials = this.changePotentials.bind(this)
         this.changeNumbers = this.changeNumbers.bind(this)
@@ -82,6 +99,12 @@ export default class Sudoku extends React.Component {
         }    
 
         fullSudokuCreator.onmessage = (e) => {
+            let newCreatedSudoku = [];
+            for (let i = 0; i < e.data.length; i++){
+                newCreatedSudoku[i] = e.data[i].slice();
+            }
+
+            this.setState({fullSudokuCreator: newCreatedSudoku})
             if(this.state.methodNumber === 0){
                 humanCreatorInstance.postMessage({sudoku: e.data, difficulty: this.state.difficulty})
             }else{
@@ -231,6 +254,10 @@ export default class Sudoku extends React.Component {
         this.setState({colors: colors})
     }
 
+    async cancelSolvingSudokuByUser(){
+        this.setState({solveItYourself: false})
+    }
+
     async checkIfSolvable(newSudoku){
        let numberOfSolutions = await sudoku.checkIfSolvable(newSudoku)
        return numberOfSolutions
@@ -255,107 +282,112 @@ export default class Sudoku extends React.Component {
         return
     }
 
-  
 
 render() {
     return (
-        <div className="box">
-            <div className="grid-container sudoku-grid">
-                <div className="sudoku-div">
-                    <table className="sudokuTable">
-                        <caption style={{background: this.state.captionColor, color: "white"}} >{this.state.caption}</caption>
-                        <colgroup><col/><col/><col/></colgroup>
-                        <colgroup><col/><col/><col/></colgroup>
-                        <colgroup><col/><col/><col/></colgroup>
-                        <tbody>
-                            {this.state.numbersSudoku.map((_value, index) => {
-                                return( 
-                                    <tr key={index}>
-                                        {this.state.numbersSudoku[index].map((value, index2) => {
-                                            const color = this.state.colors[index][index2]
-                                            const showWave = color === "blue" || color === "green"
+        <>
+            {!this.state.solveItYourself?
+                <div className="box">
+                    <div className="grid-container sudoku-grid">
+                        <div className="sudoku-div">
+                            <table className="sudokuTable">
+                                <caption style={{background: this.state.captionColor, color: "white"}} >{this.state.caption}</caption>
+                                <colgroup><col/><col/><col/></colgroup>
+                                <colgroup><col/><col/><col/></colgroup>
+                                <colgroup><col/><col/><col/></colgroup>
+                                <tbody>
+                                    {this.state.numbersSudoku.map((_value, index) => {
+                                        return( 
+                                            <tr key={index}>
+                                                {this.state.numbersSudoku[index].map((value, index2) => {
+                                                    const color = this.state.colors[index][index2]
+                                                    const showWave = color === "blue" || color === "green"
 
-                                            if(this.state.numbersSudoku[index][index2]!==0) 
-                                                return(
-                                                <td key={index2} id={"sd"+index.toString()+index2.toString()} style={{color: color, position: "relative"}}>
-                                                    {value}
-                                                    {showWave?
-                                                        <span className='wave'>
-                                                        
-                                                        </span>
-                                                    :
-                                                        null
+                                                    if(this.state.numbersSudoku[index][index2]!==0) 
+                                                        return(
+                                                            <td key={index2} id={"sd"+index.toString()+index2.toString()} style={{color: color, position: "relative"}}>
+                                                                {value}
+                                                                {showWave?
+                                                                    <span className='wave'>
+                                                                    
+                                                                    </span>
+                                                                :
+                                                                    null
+                                                                }
+                                                                
+                                                            </td>
+                                                        )
+                                                    else if(this.state.potentialNumbers[index][index2].length===0) {
+                                                        return (
+                                                            <td key={index2}></td>
+                                                        )
                                                     }
-                                                    
-                                                </td>
-                                                )
-                                            else if(this.state.potentialNumbers[index][index2].length===0) {
-                                                return (
-                                                    <td key={index2}></td>
-                                                )
-                                            }
-                                            else{
-                                                return(
-                                                <td key={index2}>
-                                                    <span className="potential_numbers">
-                                                        {this.state.potentialNumbers[index][index2].join(" ")}
-                                                    </span>
-                                                    
-                                                </td>   
-                                                )
-                                            }  
-                                        })}
-                                </tr>)
-                            })}
-                        </tbody>
-                    </table>
-                </div>    
-                <div className="right buttons-div">
-                    <button disabled={this.state.buttonDisable} onClick={()=> this.openModal()} className="button add">Create</button>
-                    <button disabled={this.state.buttonDisable} onClick={()=> this.newSudoku()} className="button create">New</button>
-                    <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
+                                                    else{
+                                                        return(
+                                                        <td key={index2}>
+                                                            <span className="potential_numbers">
+                                                                {this.state.potentialNumbers[index][index2].join(" ")}
+                                                            </span>
+                                                            
+                                                        </td>   
+                                                        )
+                                                    }  
+                                                })}
+                                        </tr>)
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>    
+                        <div className="right buttons-div">
+                            <button disabled={this.state.buttonDisable} className="button add" onClick={()=>this.setState({solveItYourself: true})}>Try It Yourself</button>
+                            <button disabled={this.state.buttonDisable} onClick={()=> this.openModal()} className="button add">Create</button>
+                            <button disabled={this.state.buttonDisable} onClick={()=> this.newSudoku()} className="button create">New</button>
+                            <button disabled={this.state.buttonDisable} onClick={()=> this.beginSolving()} className="button solve">Solve</button>
+                        </div>
+                            <div className="label-area glass glass-rounded">
+                                <div className='option-area'>
+                                    <label>Speed of solving :   {this.state.speed}</label>
+                                    <input type="range" min="0" max={MAX_SPEED_NUMBER} value={this.state.speed} 
+                                        onChange={ (e) => this.setState({ speed: parseInt(e.target.value) })}  id="myRange"></input>
+                                </div>
+                                <div className='option-area' >
+                                    <label htmlFor="difficultySelect">Method of Solving:</label>
+                                    <select id="difficultySelect" value={this.state.methodNumber} onChange={(e)=>{this.setState({methodNumber: parseInt(e.target.value)})}}>
+                                        {METHODS_OF_SOLVING.map((method, index) => (
+                                        <option key={index} value={method.methodNumber}>
+                                            {method.name}
+                                        </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className='option-area' style={{paddingTop: "0.4rem"}}>
+                                    <label htmlFor="methodSelect">Select Difficulty:</label>
+                                    <select id="methodSelect" value={this.state.difficulty} onChange={(e)=>this.setState({difficulty: e.target.value})}>
+                                        {DIFFICULTIES.map((difficulty, index) => (
+                                        <option key={index} value={difficulty}>
+                                            {difficulty}
+                                        </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="explaining-labels">
+                                <div className="small-box glass glass-rounded">
+                                    <div> <div className="rectangle black"></div> - Base numbers</div>
+                                    <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
+                                    <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>
+                                    <div> <div className="rectangle green"></div> - Single possibility in area</div>
+                                </div>   
+                            </div>
+                        </div>
+                        
+                        
+                    <NewSudokuModal checkIfSolvable={this.checkIfSolvable} changeSudoku={this.changeSudoku} closeModal={this.closeModal} modalIsOpen={this.state.modalIsOpen} />
                 </div>
-                    <div className="label-area glass glass-rounded">
-                        <div className='option-area'>
-                            <label>Speed of solving :   {this.state.speed}</label>
-                            <input type="range" min="0" max={MAX_SPEED_NUMBER} value={this.state.speed} 
-                                onChange={ (e) => this.setState({ speed: parseInt(e.target.value) })}  id="myRange"></input>
-                        </div>
-                        <div className='option-area' >
-                            <label htmlFor="difficultySelect">Method of Solving:</label>
-                            <select id="difficultySelect" value={this.state.methodNumber} onChange={(e)=>{this.setState({methodNumber: parseInt(e.target.value)})}}>
-                                {METHODS_OF_SOLVING.map((method, index) => (
-                                <option key={index} value={method.methodNumber}>
-                                    {method.name}
-                                </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className='option-area' style={{paddingTop: "0.4rem"}}>
-                            <label htmlFor="methodSelect">Select Difficulty:</label>
-                            <select id="methodSelect" value={this.state.difficulty} onChange={(e)=>this.setState({difficulty: e.target.value})}>
-                                {DIFFICULTIES.map((difficulty, index) => (
-                                <option key={index} value={difficulty}>
-                                    {difficulty}
-                                </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="explaining-labels">
-                        <div className="small-box glass glass-rounded">
-                            <div> <div className="rectangle black"></div> - Base numbers</div>
-                            <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
-                            <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>
-                            <div> <div className="rectangle green"></div> - Single possibility in area</div>
-                        </div>   
-                    </div>
-                </div>
-                
-                 
-            <NewSudokuModal checkIfSolvable={this.checkIfSolvable} changeSudoku={this.changeSudoku} closeModal={this.closeModal} modalIsOpen={this.state.modalIsOpen} />
-        </div>
-    
+            :
+                <SudokuUserSolver cancelFunction={this.cancelSolvingSudokuByUser} completedSudoku={this.state.sudokuWithAllNumbers} sudoku={this.state.numbersSudoku}/>
+            }
+        </>
     );
   }
 }

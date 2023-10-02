@@ -118,7 +118,7 @@ export default () => {
         };
 
         const newSudoku = createNewSudoku()
-
+        
         postMessage(newSudoku)
     }
 }
