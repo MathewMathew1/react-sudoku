@@ -244,7 +244,7 @@ export default class KnightTour extends React.Component {
                 }
             }
         }
-        this.setState({labelDescription: "Your have lost"})
+        this.setState({labelDescription: "You have lost"})
         this.setState({labelColor: "red"})
         this.setState({gameStarted: false})
         this.setBestScore()
@@ -297,7 +297,7 @@ export default class KnightTour extends React.Component {
                             </tbody>
                         </table>
                     </div>    
-                    <div className="labels">
+                    <div className="labels white">
                         <div className="right">
                             <div className="very-small-box glass ">
                                 Best Score: Loss {this.state.bestScore}
@@ -309,10 +309,10 @@ export default class KnightTour extends React.Component {
                             <button onClick={()=> this.reset()} className="button create">Reset</button>
                         </div>
                     </div>
-                    <div className="label-rules">
+                    <div className="label-rules white">
                         <div className="small-box glass glass-rounded" style={{maxWidth: "500px"}}>
                             <h3>Rules of Game: </h3>
-                            Place knight on tile and press start.Ai will move knight to different tile, then it is your turn. You/Ai cannot move knight to tile that was already visited. Red boxes on tiles symbolize, that this tile was already visited. First player that cannot find a move loses.
+                            Place a knight on a tile and press start. AI will move the knight to a different tile, then it's your turn. You/AI cannot move the knight to a tile that has already been visited. Red boxes on tiles symbolize that the tile has already been visited. The first player who cannot find a move loses.
                         </div> 
                     </div> 
                 </div>              
