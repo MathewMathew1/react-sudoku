@@ -293,7 +293,7 @@ export default class Pathfinder extends React.Component {
                         </table>
                     </div>
                
-                    <div className="agenda-labels">
+                    <div className="agenda-labels white">
                         <div className="small-box glass glass-rounded">
                             <div> <div className="rectangle black"></div> - Impassable tile</div>
                             <div> <div className="rectangle brown"></div> - Mountain = 3 cost of normal tile</div>
