@@ -92,8 +92,7 @@ export default () => {
             numberListArranged = numberListArrangedCopy
         }
         
-        const createNewSudoku = () =>{    
-            
+        const createNewSudoku = () =>{           
             arrangeNumber()    
             let newCreatedSudoku = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],

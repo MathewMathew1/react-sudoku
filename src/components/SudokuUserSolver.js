@@ -19,13 +19,14 @@ const SudokuUserSolver = ({sudoku, completedSudoku, cancelFunction}) => {
             return
         }
 
-        let value = parseInt(e.target.value) || ""; // Parse the input value to an integer
+        let value = parseInt(e.target.value) || "";
+        if(value === ""){
+            return
+        } // Parse the input value to an integer
         if (value > 9) {
             value = value % 10; // Get the last digit
         }
-        if(value !== completedSudoku[rowIndex][colIndex]){
-            console.log(completedSudoku[rowIndex][colIndex])
-        }
+
         const newSudoku = [...sudokuSolved];
         newSudoku[rowIndex][colIndex] = value;
         setSudokuSolved(newSudoku);

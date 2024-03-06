@@ -100,6 +100,8 @@ export default class Sudoku extends React.Component {
 
         fullSudokuCreator.onmessage = (e) => {
             let newCreatedSudoku = [];
+            this.state.sudokuWithAllNumbers = e.data
+
             for (let i = 0; i < e.data.length; i++){
                 newCreatedSudoku[i] = e.data[i].slice();
             }
@@ -115,7 +117,6 @@ export default class Sudoku extends React.Component {
         }
 
         humanCreatorInstance.onmessage = (e) => {
-
             this.setState({numbersSudoku: e.data})
             this.setState({creationMode: false})
             this.setState({caption: "Sudoku Created"})
