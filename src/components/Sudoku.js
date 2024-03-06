@@ -100,7 +100,7 @@ export default class Sudoku extends React.Component {
 
         fullSudokuCreator.onmessage = (e) => {
             let newCreatedSudoku = [];
-            this.state.sudokuWithAllNumbers = e.data
+            this.setState({sudokuWithAllNumbers: e.data})
 
             for (let i = 0; i < e.data.length; i++){
                 newCreatedSudoku[i] = e.data[i].slice();
@@ -137,8 +137,9 @@ export default class Sudoku extends React.Component {
         this.setState({modalIsOpen: false})
     }
 
-    changeSudoku = (newSudoku) => {
+    changeSudoku = (newSudoku, newCompletedSudoku) => {
         this.setState({numbersSudoku: newSudoku})
+        this.setState({sudokuWithAllNumbers: newCompletedSudoku})
     }
 
     changeMethodOfSolving = () => {
@@ -260,8 +261,9 @@ export default class Sudoku extends React.Component {
     }
 
     async checkIfSolvable(newSudoku){
-       let numberOfSolutions = await sudoku.checkIfSolvable(newSudoku)
-       return numberOfSolutions
+       let checkIfSolvable = await sudoku.checkIfSolvable(newSudoku)
+
+       return checkIfSolvable
     }
     
     async updateCaptions(caption, captionColor){

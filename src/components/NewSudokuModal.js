@@ -54,21 +54,21 @@ export default class NewSudokuModal extends React.Component {
             }
         }
         
-        let numberOfSolutions = await this.props.checkIfSolvable(copySudoku)
+        let checkIfSolvable = await this.props.checkIfSolvable(copySudoku)
        
         this.setState({beingSolved: false})
-        if(numberOfSolutions>1){
+        if(checkIfSolvable.uniqueSolutions>1){
             this.setState({errorsNewSudoku: ["Sudoku not solvable(more than one possibility)"]})
             return
         }        
         
-        if(numberOfSolutions===0){
+        if(checkIfSolvable.uniqueSolutions===0){
             
             this.setState({errorsNewSudoku: ["Sudoku not solvable(zero ways of solving)"]})
             return
         }
         
-        this.props.changeSudoku(copySudoku)
+        this.props.changeSudoku(copySudoku, checkIfSolvable.sudoku)
         this.props.closeModal()
         this.setState({newSudoku: [["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],
         ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", "", ""],

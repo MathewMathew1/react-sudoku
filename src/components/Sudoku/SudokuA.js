@@ -23,6 +23,7 @@ export default class SudokuA {
         this.numberListArranged = [1,2,3,4,5,6,7,8,9]
         this.changeNumbers = changeNumbers
         this.uniqueSolutions = 0
+        this.sudokuNumbers = [[]]
         
         for(let i=0; i<9; i++){
             this.potentialNumbers.push([])
@@ -38,7 +39,7 @@ export default class SudokuA {
         for (let i = 0; i < newNumbers.length; i++){
             newSudoku[i] = newNumbers[i].slice();
         }  
-       this.numbers = newSudoku
+        this.numbers = newSudoku
     }
 
     async cleanPossibilities(){
@@ -52,7 +53,7 @@ export default class SudokuA {
     async checkIfSolvable(sudoku){
         this.uniqueSolutions = 0
         await this.checkNumberOfSolutions(sudoku)
-        return this.uniqueSolutions
+        return {uniqueSolutions: this.uniqueSolutions, sudoku: this.sudokuNumbers}
     }
 
     async checkNumberOfSolutions(sudoku){
@@ -62,7 +63,12 @@ export default class SudokuA {
         let tile = [0, 0]
 
         if(!findEmptyLocation(sudoku, tile)){
-      
+            this.sudokuNumbers = []
+
+            for (let i = 0; i < sudoku.length; i++){
+                this.sudokuNumbers[i] = sudoku[i].slice();
+            }  
+
             this.uniqueSolutions += 1
             return
         } 
