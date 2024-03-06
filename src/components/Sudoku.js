@@ -371,7 +371,7 @@ render() {
                                     </select>
                                 </div>
                             </div>
-                            <div className="explaining-labels">
+                            <div className="explaining-labels white">
                                 <div className="small-box glass glass-rounded">
                                     <div> <div className="rectangle black"></div> - Base numbers</div>
                                     <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
