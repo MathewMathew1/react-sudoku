@@ -375,7 +375,7 @@ render() {
                                 </div>
                             </div>
                             <div className="explaining-labels white">
-                                <div className="small-box glass glass-rounded">
+                                <div className="small-box glass glass-hovered glass-rounded">
                                     <div> <div className="rectangle black"></div> - Base numbers</div>
                                     <div> <div className="rectangle red"></div> - Potential numbers/Brute force</div>
                                     <div> <div className="rectangle blue"></div> - Single possibility in row/col/square</div>
